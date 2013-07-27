@@ -9,6 +9,21 @@
 #define PRES_H_
 
 
+#define FILESYSTEM_NETWORK_CONFIGURATION 			0
+#define FILESYSTEM_NETWORK_CONFIGURATION_SIZE 		10
+#define FILESYSTEM_DEVICE_FEATURES 					FILESYSTEM_NETWORK_CONFIGURATION + FILESYSTEM_NETWORK_CONFIGURATION_SIZE
+#define FILESYSTEM_DEVICE_FEATURES_SIZE 			48
+#define FILESYSTEM_CHANNEL_CONFIGURATION			FILESYSTEM_DEVICE_FEATURES + FILESYSTEM_DEVICE_FEATURES_SIZE
+#define FILESYSTEM_CHANNEL_CONFIGURATION_SIZE		64
+#define FILESYSTEM_REAL_TIME_SCHEDULER				FILESYSTEM_CHANNEL_CONFIGURATION + FILESYSTEM_CHANNEL_CONFIGURATION_SIZE
+#define FILESYSTEM_REAL_TIME_SCHEDULER_SIZE			0
+#define FILESYSTEM_SLEEP_SCAN_SCHEDULER				FILESYSTEM_REAL_TIME_SCHEDULER + FILESYSTEM_REAL_TIME_SCHEDULER_SIZE
+#define FILESYSTEM_SLEEP_SCAN_SCHEDULER_SIZE		32
+#define FILESYSTEM_HOLD_SCAN_SCHEDULER				FILESYSTEM_SLEEP_SCAN_SCHEDULER + FILESYSTEM_SLEEP_SCAN_SCHEDULER_SIZE
+#define FILESYSTEM_HOLD_SCAN_SCHEDULER_SIZE			32
+#define FILESYSTEM_BEACON_TRANSMIT_SERIES			FILESYSTEM_HOLD_SCAN_SCHEDULER + FILESYSTEM_HOLD_SCAN_SCHEDULER_SIZE
+#define FILESYSTEM_BEACON_TRANSMIT_SERIES_SIZE		24
+
 #define SETTING_SELECTOR_SLEEP_SCHED 1 << 15
 #define SETTING_SELECTOR_HOLD_SCHED 1 << 14
 #define SETTING_SELECTOR_BEACON_SCHED 1 << 13
@@ -30,6 +45,16 @@
 // ADD .fs			: {} > FLASH to .cmd file to use filesystem
 
 #pragma DATA_SECTION(filesystem, ".fs")
+
+const uint8_t isfb_files[] = {				// ID
+		FILESYSTEM_NETWORK_CONFIGURATION, 	// 0x01
+		FILESYSTEM_DEVICE_FEATURES,			// 0x02
+		FILESYSTEM_CHANNEL_CONFIGURATION,	// 0x0
+		FILESYSTEM_REAL_TIME_SCHEDULER,		// 0x0
+		FILESYSTEM_SLEEP_SCAN_SCHEDULER,	// 0x0
+		FILESYSTEM_HOLD_SCAN_SCHEDULER,		// 0x0
+		FILESYSTEM_BEACON_TRANSMIT_SERIES,	// 0x0
+};
 
 const uint8_t filesystem[] = {
 		/* ID=0x00: network configuration - length = 10 - allocation = 10 */
@@ -75,7 +100,44 @@ const uint8_t filesystem[] = {
 	    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Channel 5 - dummy data
 	    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Channel 6 - dummy data
 	    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Channel 7 - dummy data
-	    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF//, // Channel 8 - dummy data
+	    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Channel 8 - dummy data
+
+	    /* ID=0x03: Real Time Scheduler (Optional) - Length = 12 bytes - Allocation = 12 bytes */
+	    // Not used
+
+	    /* ID=0x04:  Sleep Channel Scan Series - Length 4 bytes / channel scan datum - Allocation = min 32 bytes */
+	    // Not used in this example
+	    0xFF, 0xFF, 0xFF, 0xFF,                      // Channel ID, Scan Code, Next Scan ticks
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+
+		/* ID=0x05:  Hold Channel Scan Series - Length 4 bytes / channel scan datum - Allocation = min 32 bytes */
+		// Not used in this example
+		0xFF, 0xFF, 0xFF, 0xFF,                      // Channel ID, Scan Code, Next Scan ticks
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF,
+
+		/* ID=0x06: Beacon Transmit Period List - Length = 8 bytes - Allocation = 24 bytes */
+		// Period 1
+		0x10, 										// Channel ID
+		B00000010, 									// Beacon Command Params -> No Response
+		0x20, 0x00, 0x00, 0x08, 					// D7AQP Call Template
+		SPLITUINT16(0x0400),						// Next Beacon -> 1024 ticks = 1 s
+
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Period 2 - Not Used
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Period 3 - Not Used
+
+
 };
 
 #endif /* PRES_H_ */
