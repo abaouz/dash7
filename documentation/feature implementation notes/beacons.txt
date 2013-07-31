@@ -1,0 +1,64 @@
+beacon
+
+get beacon configuration from filesytem
+ - if no file -> abort
+ - if no beacon attempts == 0 -> abort
+
+ * byte 1: channel id
+ * byte 2: command params
+ * byte 3-6 isf call template: max bytes, isf id, offset (2byte)
+ * byte 7-8: next scan ticks
+ 
+create new session 
+ - ad hoc session 
+ - specific channel (Byte1)
+ - network state: OT: init | fristrx (stops receiving after first RX found)
+ - beacon subnet see network configuraton 
+ - frame configuration field (see Table 8.4.1.2) 
+	- default device flags & 0xC0 (= listen & dlls)
+	- beacon command params & 0x30 (= vid & nls)
+	
+Query
+ - ISF call template from config (B3-6)
+ - network protocol: create header -> which will go to query protocol
+	- based on session
+	- addressing: 0x40
+	- create frame control byte
+	- source address is always included in network protocol
+- query transport protocol
+	- command code
+		- command type : na2p request
+		- opcode: announcement of file
+	
+- communication parameters
+	- set default Tc for beacons: e.g. 12
+	- set rx timeout: default 5 or 2 depending on channel, but 0 when no listens is enabled in command params
+	- set csma according to channel and command params
+	- set channel tx and if required (for ack) rx
+	- set number of redundants beacons to be transmitted
+	
+- query transport protocol
+	- dialog template
+		- response timeout
+		- set response channel list (if existent)
+		
+- query transport protocol - beacon isf call		
+	- command data - e.g. single file  return template (since it is an anncouncement) 
+		- try to open file, if not ok -> abort
+		- comparison file id
+		- comparison byte offset
+		- isfb total length
+		- file data
+- security footers if needed
+- set length		
+		
+
+	
+	
+ 
+ 
+ queue next beacon event
+ 
+ 
+ 
+ 

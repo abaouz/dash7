@@ -43,6 +43,20 @@ typedef struct {
 } nwl_routing_header;
 
 
+typedef struct
+{
+	uint8_t comparision_series_id;
+	uint16_t comparision_byte_offset;
+} file_series_comparison_template;
+
+typedef struct
+{
+	uint8_t max_returned_bytes;
+	uint8_t series_id;
+	uint16_t file_series_data_offset;
+} file_series_call_template;
+
+
 typedef void (*nwl_tx_callback_t)(Dll_Tx_Result);
 typedef void (*nwl_rx_callback_t)(nwl_rx_res_t *);
 
@@ -62,3 +76,6 @@ void nwl_build_advertising_protocol_data(uint8_t channel_id, uint16_t eta, int8_
 void nwl_build_network_protocol_data(uint8_t* data, uint8_t length, nwl_security* security, nwl_routing_header* routing, uint8_t subnet, uint8_t spectrum_id, int8_t tx_eirp, uint8_t dialog_id);
 
 void nwl_build_datastream_protocol_data(uint8_t* data, uint8_t length, uint8_t subnet, uint8_t spectrum_id, int8_t tx_eirp, uint8_t dialog_id);
+
+
+

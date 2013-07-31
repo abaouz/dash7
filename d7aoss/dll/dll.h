@@ -143,6 +143,17 @@ typedef struct
 	dll_channel_scan_t* values;
 } dll_channel_scan_series_t;
 
+typedef struct
+{
+	uint8_t channel_id;
+	uint8_t csma_ca_params; // which type?
+	uint8_t* frame_data;
+	uint16_t response_contention_period_tiemout;
+	uint8_t redundancy_count;
+	uint16_t next_beacon_event;
+} dll_beacon_transmission_datum_parameters;
+
+
 
 extern phy_tx_cfg_t *current_phy_cfg;
 
