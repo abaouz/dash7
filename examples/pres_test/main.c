@@ -51,12 +51,26 @@ int main(void) {
 	log_print_data(device_id, 8);
 
 	file_handler fh;
-	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x00, file_system_user_user, file_system_access_type_read);
 
-	while(1)
+	uint8_t i = 0;
+	uint8_t result;
+
+	for (; i < FILESYSTEM_NR_OF_ISFB_FILES + 1; i++)
 	{
-		system_lowpower_mode(4,1);
+		log_print_string("Getting file %x", i);
+		result = fs_open(&fh, file_system_type_isfb, i, file_system_user_user, file_system_access_type_read);
+		log_print_string("Result: %i", result);
+
+		if (result == 0)
+		{
+			log_print_data(fh.file, fh.file_info->length);
+		}
 	}
+
+//	while(1)
+//	{
+//		system_lowpower_mode(4,1);
+//	}
 }
 
 

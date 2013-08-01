@@ -12,7 +12,7 @@
 #include "pres/pres.h"
 
 #define FILESYSTEM_NETWORK_CONFIGURATION_SIZE 		10
-#define FILESYSTEM_DEVICE_FEATURES_SIZE 			48
+#define FILESYSTEM_DEVICE_FEATURES_SIZE 			32
 #define FILESYSTEM_CHANNEL_CONFIGURATION_SIZE		64
 #define FILESYSTEM_REAL_TIME_SCHEDULER_SIZE			0
 #define FILESYSTEM_SLEEP_SCAN_SCHEDULER_SIZE		32
@@ -20,12 +20,14 @@
 #define FILESYSTEM_BEACON_TRANSMIT_SERIES_SIZE		24
 
 #define FILESYSTEM_NETWORK_CONFIGURATION_LENGTH		10
-#define FILESYSTEM_DEVICE_FEATURES_LENGTH			48
+#define FILESYSTEM_DEVICE_FEATURES_LENGTH			32
 #define FILESYSTEM_CHANNEL_CONFIGURATION_LENGTH		8
 #define FILESYSTEM_REAL_TIME_SCHEDULER_LENGTH		0
 #define FILESYSTEM_SLEEP_SCAN_SCHEDULER_LENGTH		32
 #define FILESYSTEM_HOLD_SCAN_SCHEDULER_LENGTH		32
 #define FILESYSTEM_BEACON_TRANSMIT_SERIES_LENGTH	24
+
+#define FILESYSTEM_NR_OF_ISFB_FILES					7
 
 // must correspond with your linker file
 #define FILESYSTEM_FILE_INFO_START_ADDRESS			0x8000
@@ -39,7 +41,7 @@ const filesystem_address_info fs_info = { FILESYSTEM_FILE_INFO_START_ADDRESS, FI
 #pragma RETAIN(filesystem_info_headers)
 const uint8_t filesystem_info_headers[] = {
 		/* Number of files */
-		7, // Number of ISFB files
+		FILESYSTEM_NR_OF_ISFB_FILES, // Number of ISFB files
 
 
 		/* ID=0x00: network configuration - length = 10 - allocation = 10 */
@@ -104,7 +106,7 @@ const uint8_t filesystem_files[] = {
 	    2,                  						// Beacon Redundancy (attempts)
 	    SPLITUINT16(0x0002),             			// Hold Scan Sequence Cycles
 
-	    /* ID=0x01: device features - length = 48 - allocation = 48 */
+	    /* ID=0x01: device features - length = 32 - allocation = 32 */
 	    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,	// Device ID
 	    B00000010,B00000110,  						// Supported Setting
 	    127,										// Max Frame Length
@@ -169,7 +171,7 @@ const uint8_t filesystem_files[] = {
 		// Period 1
 		0x10, 										// Channel ID
 		B00000010, 									// Beacon Command Params -> No Response
-		0x20, 0x00, 0x00, 0x08, 					// D7AQP Call Template
+		0x02, 0x00, 0x00, 0x00, 					// D7AQP Call Template
 		SPLITUINT16(0x0400),						// Next Beacon -> 1024 ticks = 1 s
 
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Period 2 - Not Used
