@@ -21,6 +21,8 @@
 
 #include "driverlib/inc/hw_types.h"
 
+typedef  uint16_t mem_address;
+
 uint8_t device_id[8];
 uint8_t virtual_id[2];
 uint32_t clock_speed;

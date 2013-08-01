@@ -17,28 +17,11 @@
 #ifndef PRES_H_
 #define PRES_H_
 
-
-#define FILESYSTEM_NETWORK_CONFIGURATION_SIZE 		10
-#define FILESYSTEM_DEVICE_FEATURES_SIZE 			48
-#define FILESYSTEM_CHANNEL_CONFIGURATION_SIZE		64
-#define FILESYSTEM_REAL_TIME_SCHEDULER_SIZE			0
-#define FILESYSTEM_SLEEP_SCAN_SCHEDULER_SIZE		32
-#define FILESYSTEM_HOLD_SCAN_SCHEDULER_SIZE			32
-#define FILESYSTEM_BEACON_TRANSMIT_SERIES_SIZE		24
-
-#define FILESYSTEM_NETWORK_CONFIGURATION_LENGTH		10
-#define FILESYSTEM_DEVICE_FEATURES_LENGTH			48
-#define FILESYSTEM_CHANNEL_CONFIGURATION_LENGTH		8
-#define FILESYSTEM_REAL_TIME_SCHEDULER_LENGTH		0
-#define FILESYSTEM_SLEEP_SCAN_SCHEDULER_LENGTH		32
-#define FILESYSTEM_HOLD_SCAN_SCHEDULER_LENGTH		32
-#define FILESYSTEM_BEACON_TRANSMIT_SERIES_LENGTH	24
-
-#define FILESYSTEM_IFSB_FILES						7
-
 // must correspond with your linker file
+//TODO: check how this could be in filesystem.c not in d7oos
 #define FILESYSTEM_FILE_INFO_START_ADDRESS			0x8000
 #define FILESYSTEM_FILES_START_ADDRESS				0x8064
+
 
 
 #define FILESYSTEM_NETWORK_CONFIGURATION 			0
@@ -84,7 +67,17 @@
 #include "../types.h"
 #include "../hal/system.h"
 
+//TODO: uint16_t is only for 16 bit address, should be HW depended
+typedef struct
+{
+	uint16_t file_info_start_address;
+	uint16_t files_start_address;
+} filesystem_address_info;
 
+typedef struct
+{
+	uint8_t nr_isfb;
+} filesystem_info;
 
 typedef struct
 {
@@ -123,8 +116,10 @@ typedef enum
 } file_system_access_type;
 
 
-extern const uint8_t filesystem_info[];
+extern const uint8_t filesystem_info_headers[];
 extern const uint8_t filesystem_files[];
+
+
 
 /** Opens a file and gives file_handler and return code
  * 	@param fh the returned file handler
@@ -135,7 +130,7 @@ extern const uint8_t filesystem_files[];
  * 	@return status variable: 0: succes, 1 file not found, 2 incorrect user rights
  */
 uint8_t fs_open(file_handler *fh, file_system_type fst, uint8_t file_id, file_system_user user, file_system_access_type access_type);
-void pres_init();
+void pres_init(const filesystem_address_info *address_info);
 
 
 

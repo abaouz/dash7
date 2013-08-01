@@ -25,6 +25,8 @@
 #include <framework/timer.h>
 #include <msp430.h>
 
+#include "filesystem.c"
+
 
 #define SEND_INTERVAL_MS 2000
 #define SEND_CHANNEL 0x12
@@ -40,15 +42,13 @@ int main(void) {
 	system_init();
 
 	// Currently we address the Presentation Layer, this should go to an upper layer once it is working.
-	pres_init();
+
+	pres_init(&fs_info);
 
 	log_print_string("presentation layer test started");
 
 	// Log the device id
 	log_print_data(device_id, 8);
-
-	log_print_data((uint8_t*) filesystem_info, 8);
-	log_print_data((uint8_t*) filesystem_files, 8);
 
 	file_handler fh;
 	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x00, file_system_user_user, file_system_access_type_read);
@@ -78,4 +78,4 @@ __interrupt void ISR_trap(void)
 }
 
 
-#include "filesystem.c"
+

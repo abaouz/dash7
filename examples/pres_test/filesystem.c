@@ -11,9 +11,37 @@
 #include "types.h"
 #include "pres/pres.h"
 
+#define FILESYSTEM_NETWORK_CONFIGURATION_SIZE 		10
+#define FILESYSTEM_DEVICE_FEATURES_SIZE 			48
+#define FILESYSTEM_CHANNEL_CONFIGURATION_SIZE		64
+#define FILESYSTEM_REAL_TIME_SCHEDULER_SIZE			0
+#define FILESYSTEM_SLEEP_SCAN_SCHEDULER_SIZE		32
+#define FILESYSTEM_HOLD_SCAN_SCHEDULER_SIZE			32
+#define FILESYSTEM_BEACON_TRANSMIT_SERIES_SIZE		24
+
+#define FILESYSTEM_NETWORK_CONFIGURATION_LENGTH		10
+#define FILESYSTEM_DEVICE_FEATURES_LENGTH			48
+#define FILESYSTEM_CHANNEL_CONFIGURATION_LENGTH		8
+#define FILESYSTEM_REAL_TIME_SCHEDULER_LENGTH		0
+#define FILESYSTEM_SLEEP_SCAN_SCHEDULER_LENGTH		32
+#define FILESYSTEM_HOLD_SCAN_SCHEDULER_LENGTH		32
+#define FILESYSTEM_BEACON_TRANSMIT_SERIES_LENGTH	24
+
+// must correspond with your linker file
+#define FILESYSTEM_FILE_INFO_START_ADDRESS			0x8000
+#define FILESYSTEM_FILES_START_ADDRESS				0x8064
+
+const filesystem_address_info fs_info = { FILESYSTEM_FILE_INFO_START_ADDRESS, FILESYSTEM_FILES_START_ADDRESS };
+
+
 // id, address_offset, length, allocation, permissions
-#pragma DATA_SECTION(filesystem_info, ".fs_fileinfo")
-const uint8_t filesystem_info[] = {
+#pragma DATA_SECTION(filesystem_info_headers, ".fs_fileinfo")
+#pragma RETAIN(filesystem_info_headers)
+const uint8_t filesystem_info_headers[] = {
+		/* Number of files */
+		7, // Number of ISFB files
+
+
 		/* ID=0x00: network configuration - length = 10 - allocation = 10 */
 		ISFB_ID_NETWORK_CONFIGURATION,
 		FILESYSTEM_NETWORK_CONFIGURATION,
@@ -65,6 +93,7 @@ const uint8_t filesystem_info[] = {
 };
 
 #pragma DATA_SECTION(filesystem_files, ".fs_files")
+#pragma RETAIN(filesystem_files)
 const uint8_t filesystem_files[] = {
 		/* ID=0x00: network configuration - length = 10 - allocation = 10 */
 		0x00,0x00,             						// Virtual ID

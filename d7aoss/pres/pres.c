@@ -1,7 +1,7 @@
 /*
  * trans.c
  *
- *  Created on: 05-mai-2013
+ *  Created on: 25-July-2013
  *      Author: Maarten Weyn
  */
 
@@ -9,7 +9,8 @@
 #include "pres.h"
 #include "../trans/trans.h"
 
-
+static const filesystem_address_info *fs_address_info;
+static filesystem_info *fs_info;
 
 uint8_t fs_open(file_handler *fh, file_system_type fst, uint8_t file_id, file_system_user user, file_system_access_type access_type)
 {
@@ -21,10 +22,10 @@ uint8_t fs_open(file_handler *fh, file_system_type fst, uint8_t file_id, file_sy
 
 	// fst == file_system_type_isfb
 
-	if (file_id >= FILESYSTEM_IFSB_FILES)
+	if (file_id >= fs_info->nr_isfb)
 		return 1;
 
-	file_info *fi = (void*) (FILESYSTEM_FILE_INFO_START_ADDRESS + (sizeof(file_info) * file_id));
+	file_info *fi = (void*) (fs_address_info->file_info_start_address + sizeof(filesystem_info) + (sizeof(file_info) * file_id));
 
 	uint8_t permission_mask = 0;
 	// TODO: validate correct user
@@ -51,13 +52,17 @@ uint8_t fs_open(file_handler *fh, file_system_type fst, uint8_t file_id, file_sy
 		return 2;
 
 	fh->file_info = fi;
-	fh->file = (void*) (FILESYSTEM_FILES_START_ADDRESS + fi->offset);
+	fh->file = (void*) (fs_address_info->files_start_address + fi->offset);
 
 	return 0;
 }
 
-void pres_init()
+void pres_init(const filesystem_address_info *address_info)
 {
+	fs_address_info = address_info;
+
+	fs_info = (filesystem_info*) (fs_address_info->file_info_start_address);
+
 	file_handler network_settings_fh;
 	uint8_t result = fs_open(&network_settings_fh, file_system_type_isfb, 0x00, file_system_user_root, file_system_access_type_read);
 	trans_init();

@@ -6,6 +6,8 @@
 
 #include "../system.h"
 
+typedef uint32_t mem_address;
+
 void PMM_SetVCore (uint8_t level)
 {
 
