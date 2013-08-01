@@ -58,6 +58,7 @@ int main(void) {
 	for (; i < FILESYSTEM_NR_OF_ISFB_FILES + 1; i++)
 	{
 		log_print_string("Getting file %x", i);
+
 		result = fs_open(&fh, file_system_type_isfb, i, file_system_user_user, file_system_access_type_read);
 		log_print_string("Result: %i", result);
 
