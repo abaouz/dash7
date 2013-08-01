@@ -7,6 +7,7 @@
 
 
 #include "pres.h"
+#include "isfb.h"
 #include "../trans/trans.h"
 
 static const filesystem_address_info *fs_address_info;
@@ -63,7 +64,12 @@ void pres_init(const filesystem_address_info *address_info)
 
 	fs_info = (filesystem_info*) (fs_address_info->file_info_start_address);
 
-	file_handler network_settings_fh;
-	uint8_t result = fs_open(&network_settings_fh, file_system_type_isfb, 0x00, file_system_user_root, file_system_access_type_read);
+//	file_handler fh;
+//	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x00, file_system_user_root, file_system_access_type_read);
+//	isfb_network_configuration *network_configuration = (isfb_network_configuration*) network_settings_fh.file;
+//
+//	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x01, file_system_user_root, file_system_access_type_read);
+//	isfb_device_parameters *device_parameters = (isfb_network_configuration*) network_settings_fh.file;
+
 	trans_init();
 }

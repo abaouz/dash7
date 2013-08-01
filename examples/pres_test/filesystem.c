@@ -27,6 +27,8 @@
 #define FILESYSTEM_HOLD_SCAN_SCHEDULER_LENGTH		32
 #define FILESYSTEM_BEACON_TRANSMIT_SERIES_LENGTH	24
 
+#define FILESYSTEM_NR_OF_ISFB_FILES					7
+
 // must correspond with your linker file
 #define FILESYSTEM_FILE_INFO_START_ADDRESS			0x8000
 #define FILESYSTEM_FILES_START_ADDRESS				0x8064
@@ -39,7 +41,7 @@ const filesystem_address_info fs_info = { FILESYSTEM_FILE_INFO_START_ADDRESS, FI
 #pragma RETAIN(filesystem_info_headers)
 const uint8_t filesystem_info_headers[] = {
 		/* Number of files */
-		7, // Number of ISFB files
+		FILESYSTEM_NR_OF_ISFB_FILES, // Number of ISFB files
 
 
 		/* ID=0x00: network configuration - length = 10 - allocation = 10 */
