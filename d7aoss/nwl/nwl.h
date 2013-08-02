@@ -4,6 +4,10 @@
  *  Authors:
  * 		maarten.weyn@artesis.be
  */
+
+#ifndef NWL_H_
+#define NWL_H_
+
 #include "../types.h"
 #include "../dll/dll.h"
 
@@ -79,3 +83,4 @@ void nwl_build_datastream_protocol_data(uint8_t* data, uint8_t length, uint8_t s
 
 
 
+#endif /* NWL_H_ */

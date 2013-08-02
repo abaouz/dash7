@@ -13,7 +13,7 @@ typedef struct
 	uint8_t vid[2];
 	uint8_t device_subnet;
 	uint8_t beacon_subnet;
-	uint16_t active_setttings;
+	uint16_t active_settings;
 	uint8_t default_frame_config;
 	uint8_t beacon_redundancy;
 	uint16_t hold_scan_series_cycles;

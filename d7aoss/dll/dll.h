@@ -153,10 +153,6 @@ typedef struct
 	uint16_t next_beacon_event;
 } dll_beacon_transmission_datum_parameters;
 
-
-
-extern phy_tx_cfg_t *current_phy_cfg;
-
 typedef void (*dll_tx_callback_t)(Dll_Tx_Result); // TODO result param?
 typedef void (*dll_rx_callback_t)(dll_rx_res_t*);
 

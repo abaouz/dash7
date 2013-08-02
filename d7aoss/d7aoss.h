@@ -4,7 +4,6 @@
  *  Authors:
  * 		maarten.weyn@artesis.be
  *  	glenn.ergeerts@artesis.be
- *  	alexanderhoet@gmail.com
  *
  */
 
@@ -25,6 +24,11 @@ extern "C" {
 
 #include "phy/phy.h"
 #include "dll/dll.h"
+#include "nwl/nwl.h"
+#include "trans/trans.h"
+#include "pres/pres.h"
+
+void d7aoss_init(const filesystem_address_info *address_info);
 
 #ifdef __cplusplus
 extern "C" {

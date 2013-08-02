@@ -15,8 +15,7 @@
 
 
 #include <string.h>
-
-#include <pres/pres.h>
+#include <d7aoss.h>
 #include <hal/system.h>
 #include <hal/button.h>
 #include <hal/leds.h>
@@ -41,9 +40,7 @@ int main(void) {
 	// Initialize the OSS-7 Stack
 	system_init();
 
-	// Currently we address the Presentation Layer, this should go to an upper layer once it is working.
-
-	pres_init(&fs_info);
+	d7aoss_init(&fs_info);
 
 	log_print_string("presentation layer test started");
 
@@ -60,7 +57,7 @@ int main(void) {
 		log_print_string("Getting file %x", i);
 
 		result = fs_open(&fh, file_system_type_isfb, i, file_system_user_user, file_system_access_type_read);
-		log_print_string("Result: %i", result);
+		log_print_string("Result: %d", result);
 
 		if (result == 0)
 		{

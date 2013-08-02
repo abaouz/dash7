@@ -56,7 +56,6 @@ static void control_tx_callback(Dll_Tx_Result Result)
 }
 
 void trans_init(){
-	nwl_init();
 	nwl_set_tx_callback(&control_tx_callback);
 }
 

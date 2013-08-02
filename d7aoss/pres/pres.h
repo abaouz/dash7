@@ -66,6 +66,7 @@
 
 #include "../types.h"
 #include "../hal/system.h"
+#include "isfb.h"
 
 //TODO: uint16_t is only for 16 bit address, should be HW depended
 typedef struct
@@ -120,6 +121,7 @@ extern const uint8_t filesystem_info_headers[];
 extern const uint8_t filesystem_files[];
 
 
+void pres_init(const filesystem_address_info *address_info);
 
 /** Opens a file and gives file_handler and return code
  * 	@param fh the returned file handler
@@ -130,7 +132,11 @@ extern const uint8_t filesystem_files[];
  * 	@return status variable: 0: succes, 1 file not found, 2 incorrect user rights
  */
 uint8_t fs_open(file_handler *fh, file_system_type fst, uint8_t file_id, file_system_user user, file_system_access_type access_type);
-void pres_init(const filesystem_address_info *address_info);
+
+uint8_t fs_read_byte(file_handler *fh, uint8_t offset);
+
+uint16_t fs_read_short(file_handler *fh, uint8_t offset);
+
 
 
 

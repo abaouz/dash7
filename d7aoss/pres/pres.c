@@ -7,11 +7,24 @@
 
 
 #include "pres.h"
-#include "isfb.h"
-#include "../trans/trans.h"
 
 static const filesystem_address_info *fs_address_info;
 static filesystem_info *fs_info;
+
+void pres_init(const filesystem_address_info *address_info)
+{
+	fs_address_info = address_info;
+
+	fs_info = (filesystem_info*) (fs_address_info->file_info_start_address);
+
+//	file_handler fh;
+//	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x00, file_system_user_root, file_system_access_type_read);
+//	isfb_network_configuration *network_configuration = (isfb_network_configuration*) network_settings_fh.file;
+//
+//	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x01, file_system_user_root, file_system_access_type_read);
+//	isfb_device_parameters *device_parameters = (isfb_network_configuration*) network_settings_fh.file;
+}
+
 
 uint8_t fs_open(file_handler *fh, file_system_type fst, uint8_t file_id, file_system_user user, file_system_access_type access_type)
 {
@@ -58,18 +71,27 @@ uint8_t fs_open(file_handler *fh, file_system_type fst, uint8_t file_id, file_sy
 	return 0;
 }
 
-void pres_init(const filesystem_address_info *address_info)
+uint8_t fs_read_byte(file_handler *fh, uint8_t offset)
 {
-	fs_address_info = address_info;
-
-	fs_info = (filesystem_info*) (fs_address_info->file_info_start_address);
-
-//	file_handler fh;
-//	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x00, file_system_user_root, file_system_access_type_read);
-//	isfb_network_configuration *network_configuration = (isfb_network_configuration*) network_settings_fh.file;
-//
-//	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x01, file_system_user_root, file_system_access_type_read);
-//	isfb_device_parameters *device_parameters = (isfb_network_configuration*) network_settings_fh.file;
-
-	trans_init();
+	if (fh->file_info->length > offset)
+	{
+		uint8_t* data = fh->file;
+		return data[offset];
+	}
+	else
+	{
+		return 0;
+	}
 }
+
+uint16_t fs_read_short(file_handler *fh, uint8_t offset)
+{
+	if (fh->file_info->length > offset + 1)
+	{
+		uint8_t* ptr = fh->file;
+		return *(uint16_t*) (&ptr[offset]);
+	}
+	else
+		return 0;
+}
+

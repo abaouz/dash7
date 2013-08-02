@@ -10,6 +10,7 @@
 #include "../hal/system.h"
 #include "../hal/crc.h"
 #include "../framework/log.h"
+#include "../pres/pres.h"
 #include <string.h>
 
 static dll_rx_callback_t dll_rx_callback;
@@ -20,7 +21,9 @@ static dll_rx_res_t dll_res;
 static dll_channel_scan_series_t* current_css;
 static uint8_t current_scan_id = 0;
 
-phy_tx_cfg_t *current_phy_cfg;
+static isfb_network_configuration network_config;
+
+static phy_tx_cfg_t *current_phy_cfg;
 
 
 uint8_t timeout_listen; // TL
@@ -313,13 +316,25 @@ static void rx_callback(phy_rx_data_t* res)
 
 void dll_init()
 {
-	timer_init();
-
-	phy_init();
 	phy_set_rx_callback(rx_callback);
 	phy_set_tx_callback(tx_callback);
 
 	dll_state = DllStateNone;
+
+
+	// Get Configuration Data
+	file_handler fh;
+	uint8_t result = fs_open(&fh, file_system_type_isfb, 0x00, file_system_user_root, file_system_access_type_read);
+
+	network_config.vid[1] = fs_read_byte(&fh, 0);
+	network_config.vid[0] = fs_read_byte(&fh, 1);
+	network_config.device_subnet = fs_read_byte(&fh, 2);
+	network_config.beacon_subnet = fs_read_byte(&fh, 3);
+	network_config.active_settings = fs_read_short(&fh, 4);
+	network_config.default_frame_config = fs_read_byte(&fh, 6);
+	network_config.beacon_redundancy = fs_read_byte(&fh, 7);
+	// TODO: byte order is device dependent, D7 is big endian, CC430 is little endian -> move to hal?
+	network_config.hold_scan_series_cycles = SWITCH_BYTES(fs_read_short(&fh, 8));
 }
 
 void dll_set_tx_callback(dll_tx_callback_t cb)

@@ -39,7 +39,6 @@ static void dll_rx_callback(dll_rx_res_t* result)
 
 void nwl_init()
 {
-	dll_init();
 	dll_set_tx_callback(&dll_tx_callback);
 	dll_set_rx_callback(&dll_rx_callback);
 }
