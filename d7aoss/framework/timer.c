@@ -112,13 +112,14 @@ bool timer_add_event(timer_event* event)
 
     if (event->next_event == 0)
     {
-        event->f(NULL);
+        event->f(&event->argument);
         return true;
     }
 
     timer_event new_event;
     new_event.f = event->f;
     new_event.next_event = event->next_event;
+    new_event.argument = event->argument;
 
     if (timer_insert_value_in_queue(&new_event))
     {
@@ -173,7 +174,7 @@ void timer_completed()
         	directly_fire_new_event = true;
     }
 
-    event->f(NULL);
+    event->f(&event->argument);
 
     if (directly_fire_new_event)
     	timer_completed();

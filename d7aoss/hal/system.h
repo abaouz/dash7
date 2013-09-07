@@ -13,8 +13,9 @@
 #define ENTER_CRITICAL_SECTION(x)  	__disable_interrupt(); //st( x = __read_status_register(); __disable_interrupt(); )
 #define EXIT_CRITICAL_SECTION(x)    __enable_interrupt(); //__write_status_register(x)
 
-#define SWITCH_BYTES(x) (x << 8 | x >> 8)
-#define SPLITUINT16(x) (uint8_t)((x) >> 8), (uint8_t)((x) & 0x00FF)
+#define SWITCH_BYTES(x) 	(x << 8 | x >> 8)
+#define SPLITUINT16(x) 		(uint8_t)((x) >> 8), (uint8_t)((x) & 0x00FF)
+#define MERGEUINT16(x,y)	(((uint16_t) x) >> 8) | y
 
 #if defined(__MSPGCC__)
 #define __ISR(a,b)   void __attribute__((interrupt (a))) b (void)

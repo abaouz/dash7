@@ -7,41 +7,14 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "queue.h"
 
-static void shift_queue (queue* q, uint8_t places)
-{
-	if (q->front - places < q->start)
-	{
-		// cannot move before start
-		return;
-	}
+static void shift_queue (queue* q, uint8_t places);
+static bool check_for_space(queue* q, uint8_t size);
 
-	uint8_t* data_ptr = q->front;
-	while (data_ptr <= q->rear)
-	{
-		*(data_ptr-places) = *(data_ptr++);
-	}
 
-	q->front-= places;
-	q->rear -= places;
-}
-
-static bool check_for_space(queue* q, uint8_t size)
-{
-    if (q->rear + 1 >= q->start + q->size)
-	{
-		// no place at the end anymore!
-
-		if (q->front > q->start)
-			shift_queue(q, q->start - q->front);
-		else
-			return 0;
-	}
-
-	return 1;
-}
 
 void queue_init(queue* q, uint8_t* buffer, uint16_t size)
 {
@@ -50,6 +23,14 @@ void queue_init(queue* q, uint8_t* buffer, uint16_t size)
 	q->start = buffer;
 	q->rear = NULL;
 	q->length = 0;
+}
+
+void queue_set(queue* q, uint8_t position)
+{
+	q->length = position;
+	q->front = q->start;
+	q->rear = q->start + position;
+	memset(q->start, 0, position);
 }
 
 uint8_t queue_pop_u8(queue* q)
@@ -225,4 +206,38 @@ void queue_set_u16(queue* q, uint16_t data, uint8_t position)
 bool queue_is_empty(queue* q)
 {
 	return q->front == NULL;
+}
+
+
+static void shift_queue (queue* q, uint8_t places)
+{
+	if (q->front - places < q->start)
+	{
+		// cannot move before start
+		return;
+	}
+
+	uint8_t* data_ptr = q->front;
+	while (data_ptr <= q->rear)
+	{
+		*(data_ptr-places) = *(data_ptr++);
+	}
+
+	q->front-= places;
+	q->rear -= places;
+}
+
+static bool check_for_space(queue* q, uint8_t size)
+{
+    if (q->rear + 1 >= q->start + q->size)
+	{
+		// no place at the end anymore!
+
+		if (q->front > q->start)
+			shift_queue(q, q->start - q->front);
+		else
+			return 0;
+	}
+
+	return 1;
 }

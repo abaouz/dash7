@@ -10,8 +10,15 @@
 
 #include "../types.h"
 #include "../dll/dll.h"
+#include "../session/session.h"
 
 #define BPID_AdvP 0xF0
+
+#define ROUTING_HOP_CONTROL_EXTENSION 			1 << 7
+#define ROUTING_HOP_CONTROL_ORIGIN 				1 << 6
+#define ROUTING_HOP_CONTROL_DESTINATION 		1 << 5
+#define ROUTING_HOP_CONTROL_VID 				1 << 4
+#define ROUTING_HOP_CONTROL_HOPS_REMAINING(VAL)	VAL & 0x0F
 
 typedef struct {
 	uint8_t tx_eirp;
@@ -78,6 +85,9 @@ void nwl_build_advertising_protocol_data(uint8_t channel_id, uint16_t eta, int8_
 
 // Foreground frames
 void nwl_build_network_protocol_data(uint8_t* data, uint8_t length, nwl_security* security, nwl_routing_header* routing, uint8_t subnet, uint8_t spectrum_id, int8_t tx_eirp, uint8_t dialog_id);
+
+void nwl_build_network_protocol_header(session_data *session, uint8_t addressing, bool nack, uint8_t* destination);
+void nwl_build_network_protocol_footer(session_data *session);
 
 void nwl_build_datastream_protocol_data(uint8_t* data, uint8_t length, uint8_t subnet, uint8_t spectrum_id, int8_t tx_eirp, uint8_t dialog_id);
 

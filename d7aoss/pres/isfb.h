@@ -8,6 +8,30 @@
 #ifndef ISFB_H_
 #define ISFB_H_
 
+#define ISFB_ID(VAL)                            ISFB_ID_##VAL
+#define ISFB_ID_NETWORK_CONFIGURATION			0x00
+#define ISFB_ID_DEVICE_FEATURES					0x01
+#define ISFB_ID_CHANNEL_CONFIGURATION			0x02
+#define ISFB_ID_REAL_TIME_SCHEDULER				0x03
+#define ISFB_ID_SLEEP_SCAN_SCHEDULER			0x04
+#define ISFB_ID_HOLD_SCAN_SCHEDULER				0x05
+#define ISFB_ID_BEACON_TRANSMIT_SERIES			0x06
+
+#define SETTING_SELECTOR_SLEEP_SCHED 		(uint16_t) (1 << 15)
+#define SETTING_SELECTOR_HOLD_SCHED 		(uint16_t) (1 << 14)
+#define SETTING_SELECTOR_BEACON_SCHED 		(uint16_t) (1 << 13)
+#define SETTING_SELECTOR_GATEWAY 			(uint16_t) (1 << 11)
+#define SETTING_SELECTOR_SUBCONTR 			(uint16_t) (1 << 10)
+#define SETTING_SELECTOR_ENDPOINT 			(uint16_t) (1 << 9)
+#define SETTING_SELECTOR_BLINKER 			(uint16_t) (1 << 8)
+#define SETTING_SELECTOR_345_WAY_TRANSFER 	(uint16_t) (1 << 7)
+#define SETTING_SELECTOR_2_WAY_TRANSFER 	(uint16_t) (1 << 6)
+#define SETTING_SELECTOR_FEC_TX 			(uint16_t) (1 << 5)
+#define SETTING_SELECTOR_FEC_RX 			(uint16_t) (1 << 4)
+#define SETTING_SELECTOR_BLINK_CHANNELS 	(uint16_t) (1 << 3)
+#define SETTING_SELECTOR_HI_RATE_CHANNELS 	(uint16_t) (1 << 2)
+#define SETTING_SELECTOR_NORMAL_CHANNELS 	(uint16_t) (1 << 1)
+
 typedef struct
 {
 	uint8_t vid[2];

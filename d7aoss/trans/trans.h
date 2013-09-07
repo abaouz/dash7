@@ -12,11 +12,27 @@
 #include "../types.h"
 #include "../nwl/nwl.h"
 
+#define D7AQP_COMMAND_CODE_EXTENSION		1 << 7
+#define D7AQP_COMMAND_TYPE_RESPONSE			0 << 4
+#define D7AQP_COMMAND_TYPE_ERROR_RESPONSE	1 << 4
+#define D7AQP_COMMAND_TYPE_NA2P_REQUEST		2 << 4
+#define D7AQP_COMMAND_TYPE_A2P_INIT_REQUEST	4 << 4
+#define D7AQP_COMMAND_TYPE_A2P_INTERMEDIATE_REQUEST	5 << 4
+#define D7AQP_COMMAND_TYPE_A2P_FINAL_REQUEST	7 << 4
+#define D7AQP_OPCODE_ANNOUNCEMENT_FILE				0
+#define D7AQP_OPCODE_ANNOUNCEMENT_FILE_SERIES		1
+#define D7AQP_OPCODE_INVENTORY_FILE					2
+#define D7AQP_OPCODE_INVENTORY_FILE_SERIES			3
+#define D7AQP_OPCODE_COLLECTION_FILE_FILE			4
+#define D7AQP_OPCODE_COLLECTION_SERIES_FILE			5
+
+
 typedef enum {
 	TransPacketSent,
 	TransPacketFail,
 	TransTCAFail
 } Trans_Tx_Result;
+
 
 typedef void (*trans_tx_callback_t)(Trans_Tx_Result);
 void trans_init();

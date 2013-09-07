@@ -16,6 +16,7 @@ extern "C" {
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "../session/session.h"
 
 //#define D7_PHY_USE_FEC //TODO move to general config file
 
@@ -66,7 +67,7 @@ extern phy_tx_callback_t phy_tx_callback;
 extern phy_rx_callback_t phy_rx_callback;
 
 //Phy interface
-extern void phy_init(void);
+extern void phy_ral_init(void);
 extern void phy_idle(void);
 extern bool phy_tx(phy_tx_cfg_t* cfg);
 extern bool phy_rx(phy_rx_cfg_t* cfg);
@@ -74,6 +75,10 @@ extern bool phy_read(phy_rx_data_t* data);
 extern bool phy_is_rx_in_progress(void);
 extern bool phy_is_tx_in_progress(void);
 extern int16_t phy_get_rssi(uint8_t spectrum_id, uint8_t sync_word_class);
+extern bool phy_init_tx();
+extern bool phy_translate_and_set_settings(uint8_t spectrum_id, uint8_t sync_word_class);
+extern void set_eirp(int8_t eirp);
+extern void set_data_whitening(bool white_data);
 
 extern void dissable_autocalibration();
 extern void enable_autocalibration();
@@ -82,11 +87,15 @@ extern void manual_calibration();
 extern void phy_keep_radio_on(bool);
 
 //Implementation independent phy functions
+void phy_init(void);
 void phy_set_tx_callback(phy_tx_callback_t);
 void phy_set_rx_callback(phy_rx_callback_t);
 bool phy_cca(uint8_t spectrum_id, uint8_t sync_word_class);
 bool phy_translate_settings(uint8_t spectrum_id, uint8_t sync_word_class, bool* fec, uint8_t* channel_center_freq_index, uint8_t* channel_bandwidth_index, uint8_t* preamble_size, uint16_t* sync_word);
+bool phy_tx_session(session_data* session);
 
+bool phy_channel_lookup(uint8_t channel_id);
+int8_t phy_get_max_tx_eirp(uint8_t channel_id);
 
 #ifdef __cplusplus
 }

@@ -8,7 +8,7 @@
 #include "nwl.h"
 #include "../framework/log.h"
 #include "../hal/system.h"
-
+#include "../dll/dll.h"
 
 static nwl_rx_callback_t nwl_rx_callback;
 static nwl_tx_callback_t nwl_tx_callback;
@@ -73,9 +73,7 @@ void nwl_build_advertising_protocol_data(uint8_t channel_id, uint16_t eta, int8_
 
 void nwl_build_network_protocol_data(uint8_t* data, uint8_t length, nwl_security* security, nwl_routing_header* routing, uint8_t subnet, uint8_t spectrum_id, int8_t tx_eirp, uint8_t dialog_id)
 {
-	uint8_t dll_data[248];
-	uint8_t offset = 0;
-
+	//TODO: merge to new implementation
 	dll_ff_tx_cfg_t dll_params;
 	dll_params.eirp = tx_eirp;
 	dll_params.spectrum_id = spectrum_id;
@@ -112,11 +110,60 @@ void nwl_build_network_protocol_data(uint8_t* data, uint8_t length, nwl_security
 		#endif
 	}
 
-	memcpy(&dll_data[offset], data, length);
-
-	uint8_t dll_data_length = offset + length;
+	//memcpy(&dll_data[offset], data, length);
+	queue_push_value(&tx_queue, data, length);
 
 	//TODO: assert dll_data_length < 255-7
-	dll_create_foreground_frame(dll_data, dll_data_length, &dll_params);
+	//dll_add_header_footer(&tx_queue, &dll_params);
+}
+
+void nwl_build_network_protocol_header(session_data *session, uint8_t addressing, bool nack, uint8_t* destination)
+{
+
+	dll_build_foreground_frame_header(session, (d7a_frame_type) nack, addressing, destination);
+
+	#ifdef LOG_NWL_ENABLED
+	if (session->data_link_control_flags & ADDR_CTL_NLS)
+	{
+		log_print_string("NWL: security not implemented");
+	}
+	#endif
+
+	// routing
+	if ((addressing & ADDR_CTL_BROADCAST) == 0x00) // unicast or anycast: enable routing
+	{
+		#ifdef LOG_NWL_ENABLED
+		log_print_string("NWL: multihop not implemented");
+		#endif
+
+		// currently multihop is dissabled
+		queue_push_u8(&tx_queue, ROUTING_HOP_CONTROL_HOPS_REMAINING(0));
+	}
+
+//
+//	if (routing != NULL)
+//	{
+//		#ifdef LOG_NWL_ENABLED
+//			log_print_string("NWL: routing not implemented");
+//		#endif
+//	}
+
+	//memcpy(&dll_data[offset], data, length);
+	//queue_push_value(&tx_queue, data, length);
+
+	//TODO: assert dll_data_length < 255-7
+	//dll_add_header_footer_from_session(session, &tx_queue);
+}
+
+void nwl_build_network_protocol_footer(session_data *session)
+{
+	#ifdef LOG_NWL_ENABLED
+	if (session->data_link_control_flags & ADDR_CTL_NLS)
+	{
+		log_print_string("NWL: security not implemented");
+	}
+	#endif
+
+	dll_build_foreground_frame_footer(session);
 }
 

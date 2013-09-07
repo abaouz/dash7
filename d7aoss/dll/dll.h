@@ -10,7 +10,9 @@
 #define DLL_H_
 
 #include "../types.h"
+#include "../system_core.h"
 #include "../phy/phy.h"
+#include "../session/session.h"
 
 typedef enum {
 	FrameTypeBackgroundFrame,
@@ -37,12 +39,9 @@ typedef enum {
 #define FRAME_CTL_DLLS			(1 << 6)
 #define FRAME_CTL_EN_ADDR		(1 << 5)
 #define FRAME_CTL_FR_CONT 		(1 << 4)
-#define FRAME_CTL_CRC32			(1 << 3)
-#define FRAME_CTL_NM2			(1 << 2)
 #define FRAME_CTL_DIALOGFRAME	(0)
 #define FRAME_CTL_DIALOGNACK	(1)
 #define FRAME_CTL_STREAMFRAME	(2)
-#define FRAME_CTL_RFU			(3)
 
 typedef struct {
 	uint8_t dialogId;
@@ -61,8 +60,8 @@ typedef struct {
 #define ADDR_CTL_APPFLAGS(VAL)	(VAL&0x0F)
 
 typedef struct {
-	uint8_t tx_eirp; // (-40 + 0.5n) dBm
 	uint8_t subnet;
+	uint8_t tx_eirp; // (-40 + 0.5n) dBm
 	uint8_t frame_ctl; // see FRAME_CTL_* defines
 } dll_foreground_frame_header_t;
 
@@ -96,6 +95,13 @@ typedef struct {
 	uint8_t* target_id; // only when framectrl nls = 0 and unicast
 } dll_foreground_frame_adressing;
 
+typedef enum
+{
+	d7a_frame_type_dialog_frame  = 0,
+	d7a_frame_type_dialog_nack = 1,
+	d7a_frame_type_stream_frame = 2
+} d7a_frame_type;
+
 typedef struct
 {
 	uint8_t subnet;				// Subnet
@@ -106,7 +112,7 @@ typedef struct
 	dll_foreground_frame_adressing* addressing;
 	bool nwl_security;			// Network Layer security enabled / disabled
 	bool frame_continuity; 		// A frame follow directly after the current
-	uint8_t frame_type;			// FRAME_CTL_DIALOGFRAME / FRAME_CTL_DIALOGNACK / FRAME_CTL_STREAMFRAME
+	d7a_frame_type frame_type;			// FRAME_CTL_DIALOGFRAME / FRAME_CTL_DIALOGNACK / FRAME_CTL_STREAMFRAME
 } dll_ff_tx_cfg_t;
 
 
@@ -174,7 +180,12 @@ void dll_channel_scan_series(dll_channel_scan_series_t*);
 
 void dll_create_foreground_frame(uint8_t* data, uint8_t length, dll_ff_tx_cfg_t* params);
 void dll_create_background_frame(uint8_t* data, uint8_t subnet, uint8_t spectrum_id, int8_t tx_eirp);
-
+void dll_create_beacon(task *beacon_task);
 void dll_tx_frame();
+
+void dll_build_foreground_frame_header(session_data *session, d7a_frame_type frame_type, uint8_t addressing, uint8_t* destination);
+void dll_build_foreground_frame_footer(session_data *session);
+
+void dll_tx_session();
 
 #endif /* DLL_H_ */

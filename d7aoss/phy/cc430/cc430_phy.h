@@ -53,9 +53,10 @@ typedef void (*InterruptHandler)(void);
 /*
  * Phy implementation function prototypes
  */
-void phy_init(void);
+void phy_ral_init(void);
 void phy_idle(void);
 bool phy_tx(phy_tx_cfg_t* cfg);
+bool phy_tx_session(session_data* session);
 bool phy_rx(phy_rx_cfg_t* cfg);
 bool phy_is_rx_in_progress(void);
 bool phy_is_tx_in_progress(void);

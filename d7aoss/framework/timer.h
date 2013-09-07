@@ -17,6 +17,7 @@ typedef struct
 {
 	uint16_t next_event;
 	void (*f) (void*);
+	uint8_t argument;
 
 } timer_event;
 

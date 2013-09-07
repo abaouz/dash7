@@ -32,29 +32,7 @@
 #define FILESYSTEM_HOLD_SCAN_SCHEDULER				FILESYSTEM_SLEEP_SCAN_SCHEDULER + FILESYSTEM_SLEEP_SCAN_SCHEDULER_SIZE
 #define FILESYSTEM_BEACON_TRANSMIT_SERIES			FILESYSTEM_HOLD_SCAN_SCHEDULER + FILESYSTEM_HOLD_SCAN_SCHEDULER_SIZE
 
-#define ISFB_ID(VAL)                            ISFB_ID_##VAL
-#define ISFB_ID_NETWORK_CONFIGURATION			0x00
-#define ISFB_ID_DEVICE_FEATURES					0x01
-#define ISFB_ID_CHANNEL_CONFIGURATION			0x02
-#define ISFB_ID_REAL_TIME_SCHEDULER				0x03
-#define ISFB_ID_SLEEP_SCAN_SCHEDULER			0x04
-#define ISFB_ID_HOLD_SCAN_SCHEDULER				0x05
-#define ISFB_ID_BEACON_TRANSMIT_SERIES			0x06
 
-#define SETTING_SELECTOR_SLEEP_SCHED 1 << 15
-#define SETTING_SELECTOR_HOLD_SCHED 1 << 14
-#define SETTING_SELECTOR_BEACON_SCHED 1 << 13
-#define SETTING_SELECTOR_GATEWAY 1 << 11
-#define SETTING_SELECTOR_SUBCONTR 1 << 10
-#define SETTING_SELECTOR_ENDPOINT 1 << 9
-#define SETTING_SELECTOR_BLINKER 1 << 8
-#define SETTING_SELECTOR_345_WAY_TRANSFER 1 << 7
-#define SETTING_SELECTOR_2_WAY_TRANSFER 1 << 6
-#define SETTING_SELECTOR_FEC_TX 1 << 5
-#define SETTING_SELECTOR_FEC_RX 1 << 4
-#define SETTING_SELECTOR_BLINK_CHANNELS 1 << 3
-#define SETTING_SELECTOR_HI_RATE_CHANNELS 1 << 2
-#define SETTING_SELECTOR_NORMAL_CHANNELS 1 << 1
 
 #define PERMISSION_CODE_ENCRYPTED 1 << 7
 #define PERMISSION_CODE_RUNABLE 1 << 6
@@ -133,9 +111,11 @@ void pres_init(const filesystem_address_info *address_info);
  */
 uint8_t fs_open(file_handler *fh, file_system_type fst, uint8_t file_id, file_system_user user, file_system_access_type access_type);
 
-uint8_t fs_read_byte(file_handler *fh, uint8_t offset);
+uint8_t fs_close(file_handler *fh);
 
+uint8_t fs_read_byte(file_handler *fh, uint8_t offset);
 uint16_t fs_read_short(file_handler *fh, uint8_t offset);
+uint8_t fs_read_data(file_handler *fh, uint8_t *data_array, uint8_t offset, uint8_t length);
 
 
 
