@@ -65,10 +65,10 @@ int main(void) {
 		}
 	}
 
-//	while(1)
-//	{
-//		system_lowpower_mode(4,1);
-//	}
+	while(1)
+	{
+		system_lowpower_mode(4,1);
+	}
 }
 
 

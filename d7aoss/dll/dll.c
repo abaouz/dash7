@@ -84,7 +84,7 @@ void dll_init()
 	network_config.vid[0] = fs_read_byte(&fh, 1);
 	network_config.device_subnet = fs_read_byte(&fh, 2);
 	network_config.beacon_subnet = fs_read_byte(&fh, 3);
-	network_config.active_settings = fs_read_short(&fh, 4);
+	network_config.active_settings = SWITCH_BYTES(fs_read_short(&fh, 4));
 	network_config.default_frame_config = fs_read_byte(&fh, 6);
 	network_config.beacon_redundancy = fs_read_byte(&fh, 7);
 	// TODO: byte order is device dependent, D7 is big endian, CC430 is little endian -> move to hal?

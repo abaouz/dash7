@@ -101,14 +101,14 @@ const uint8_t filesystem_files[] = {
 		0x00,0x00,             						// Virtual ID
 	    0xFF,               						// Device Subnet
 	    0xFF,       								// Beacon Subnet
-	    B00000010,B00000110,  						// Active Setting
+	    B00100010,B00000110,  						// Active Setting
 	    0x00,               						// Default Device Flags
 	    2,                  						// Beacon Redundancy (attempts)
 	    SPLITUINT16(0x0002),             			// Hold Scan Sequence Cycles
 
 	    /* ID=0x01: device features - length = 32 - allocation = 32 */
 	    0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,	// Device ID
-	    B00000010,B00000110,  						// Supported Setting
+	    B00100010,B00000110,  						// Supported Setting
 	    127,										// Max Frame Length
 	    1,											// Max Frames Per Packet
 	    SPLITUINT16(0),								// DLLS Available Methods
