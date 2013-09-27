@@ -146,7 +146,7 @@ void dll_stop_channel_scan()
 void dll_background_scan()
 {
 	#ifdef LOG_DLL_ENABLED
-		log_print_string("DLL Starting background scan");
+	log_print_stack_string(LOG_DLL, "DLL Starting background scan");
 	#endif
 
 	dll_state = DllStateScanForegroundFrame;
@@ -156,7 +156,7 @@ void dll_background_scan()
 	if (phy_get_rssi(spectrum_id, 0) <= scan_minimum_energy)
 	{
 		#ifdef LOG_DLL_ENABLED
-			log_print_string("DLL No signal deteced");
+		log_print_stack_string(LOG_DLL, "DLL No signal deteced");
 		#endif
 		return;
 	}
@@ -174,7 +174,7 @@ void dll_background_scan()
 	bool phy_rx_result = phy_rx(&rx_cfg);
 	if (!phy_rx_result)
 	{
-		log_print_string("DLL Starting channel scan FAILED");
+		log_print_stack_string(LOG_DLL, "DLL Starting channel scan FAILED");
 	}
 	#else
 	phy_rx(&rx_cfg);
@@ -183,7 +183,8 @@ void dll_background_scan()
 void dll_foreground_scan()
 {
 	#ifdef LOG_DLL_ENABLED
-		log_print_string("Starting foreground scan");
+<<<<<<< HEAD
+		log_print_stack_string(LOG_DLL, "Starting foreground scan");
 	#endif
 
 	dll_state = DllStateScanForegroundFrame;
@@ -205,6 +206,9 @@ void dll_foreground_scan()
 	}
 	#else
 	phy_rx(&rx_cfg);
+=======
+		log_print_stack_string(LOG_DLL, "DLL TX OK");
+>>>>>>> master
 	#endif
 }
 
@@ -230,14 +234,62 @@ void dll_channel_scan_series(dll_channel_scan_series_t* css)
 		dll_state = DllStateScanBackgroundFrame;
 	}
 
+<<<<<<< HEAD
 	current_css = css;
 
+=======
+	// Data Link Filtering
+	// Subnet Matching do not parse it yet
+	if (dll_state == DllStateScanBackgroundFrame)
+	{
+		uint16_t crc = crc_calculate(res->data, 4);
+		if (memcmp((uint8_t*) &(res->data[4]), (uint8_t*) &crc, 2) != 0)
+		{
+			#ifdef LOG_DLL_ENABLED
+				log_print_stack_string(LOG_DLL, "DLL CRC ERROR");
+			#endif
+			scan_next(NULL); // how to reïnitiate scan on CRC Error, PHY should stay in RX
+			return;
+		}
+
+		if (!check_subnet(0xFF, res->data[0])) // TODO: get device_subnet from datastore
+		{
+			#ifdef LOG_DLL_ENABLED
+				log_print_stack_string(LOG_DLL, "DLL Subnet mismatch");
+			#endif
+			scan_next(NULL); // how to reïnitiate scan on subnet mismatch, PHY should stay in RX
+			return;
+		}
+	} else if (dll_state == DllStateScanForegroundFrame)
+	{
+		uint16_t crc = crc_calculate(res->data, res->length - 2);
+		if (memcmp((uint8_t*) &(res->data[res->length - 2]), (uint8_t*) &crc, 2) != 0)
+		{
+			#ifdef LOG_DLL_ENABLED
+				log_print_stack_string(LOG_DLL, "DLL CRC ERROR");
+			#endif
+			scan_next(NULL); // how to reïnitiate scan on CRC Error, PHY should stay in RX
+			return;
+		}
+		if (!check_subnet(0xFF, res->data[2])) // TODO: get device_subnet from datastore
+		{
+			#ifdef LOG_DLL_ENABLED
+				log_print_stack_string(LOG_DLL, "DLL Subnet mismatch");
+			#endif
+				scan_next(NULL); // how to reïnitiate scan on subnet mismatch, PHY should stay in RX
+>>>>>>> master
 
 	#ifdef LOG_DLL_ENABLED
 	bool phy_rx_result = phy_rx(&rx_cfg);
 	if (!phy_rx_result)
 	{
+<<<<<<< HEAD
 		log_print_string("DLL Starting channel scan FAILED");
+=======
+		#ifdef LOG_DLL_ENABLED
+			log_print_stack_string(LOG_DLL, "DLL You fool, you can't be here");
+		#endif
+>>>>>>> master
 	}
 	#else
 	phy_rx(&rx_cfg);
@@ -352,6 +404,7 @@ void dll_create_foreground_frame(uint8_t* data, uint8_t length, dll_ff_tx_cfg_t*
 
 	if (params->addressing != NULL)
 	{
+<<<<<<< HEAD
 		frame->frame_header.frame_ctl |= FRAME_CTL_EN_ADDR;
 
 		dll_foreground_frame_address_ctl_t address_ctl;
@@ -375,6 +428,16 @@ void dll_create_foreground_frame(uint8_t* data, uint8_t length, dll_ff_tx_cfg_t*
 	}
 
 	if (params->frame_continuity) frame->frame_header.frame_ctl |= FRAME_CTL_FR_CONT;
+=======
+		log_print_stack_string(LOG_DLL, ("DLL no series so stop listening"));
+		return;
+	}
+
+	// in current spec reset channel scan
+	#ifdef LOG_DLL_ENABLED
+		log_print_stack_string(LOG_DLL, ("DLL restart channel scan series"));
+	#endif
+>>>>>>> master
 
 	// CRC32 not implemented
 	// frame->frame_header.frame_ctl |= FRAME_CTL_CRC32;
@@ -420,7 +483,13 @@ void dll_create_background_frame(uint8_t* data, uint8_t subnet, uint8_t spectrum
 
 void dll_create_beacon(task *beacon_task)
 {
+<<<<<<< HEAD
 	if (network_config.beacon_redundancy == 0) return;
+=======
+	#ifdef LOG_DLL_ENABLED
+		log_print_stack_string(LOG_DLL, "DLL Starting background scan");
+	#endif
+>>>>>>> master
 
 	// Get Configuration Data
 	file_handler fh;
@@ -440,7 +509,13 @@ void dll_create_beacon(task *beacon_task)
 
 	if (session->tx_eirp == 0xFF) // channel is not configured in file system
 	{
+<<<<<<< HEAD
 		session_pop();
+=======
+		#ifdef LOG_DLL_ENABLED
+			log_print_stack_string(LOG_DLL, "DLL No signal deteced");
+		#endif
+>>>>>>> master
 		return;
 	}
 
@@ -471,7 +546,11 @@ void dll_create_beacon(task *beacon_task)
 
 	if (da7qp_cmd_code & D7AQP_COMMAND_CODE_EXTENSION)
 	{
+<<<<<<< HEAD
 		queue_push_u8(&tx_queue, beacon_command_params & B00000110); // Write extension
+=======
+		log_print_stack_string(LOG_DLL, "DLL Starting channel scan FAILED");
+>>>>>>> master
 	}
 
 	// Query - Dialog Template
@@ -518,8 +597,14 @@ void dll_create_beacon(task *beacon_task)
 
 void dll_build_foreground_frame_header(session_data *session, d7a_frame_type frame_type, uint8_t addressing, uint8_t* destination)
 {
+<<<<<<< HEAD
 	// Length
 	queue_set(&tx_queue, 1); // first byte will be used for the length
+=======
+	#ifdef LOG_DLL_ENABLED
+		log_print_stack_string(LOG_DLL, "Starting foreground scan");
+	#endif
+>>>>>>> master
 
 	// TX_EIRP - (-40 + 0.5n) dBm
 	queue_push_u8(&tx_queue, (0 + 40) * 2); //where to get the eirp from?
@@ -539,7 +624,11 @@ void dll_build_foreground_frame_header(session_data *session, d7a_frame_type fra
 	#ifdef LOG_DLL_ENABLED
 	if (frame_ctrl & FRAME_CTL_DLLS)
 	{
+<<<<<<< HEAD
 		log_print_string("DLL: security not implemented");
+=======
+		log_print_stack_string(LOG_DLL, "DLL Starting channel scan FAILED");
+>>>>>>> master
 	}
 	#endif
 
@@ -572,11 +661,17 @@ void dll_build_foreground_frame_header(session_data *session, d7a_frame_type fra
 
 void dll_build_foreground_frame_footer(session_data *session)
 {
+<<<<<<< HEAD
 	// DLLS is currently not supported!
 //	if (session->data_link_control_flags & FRAME_CTL_DLLS)
 //	{
 //
 //	}
+=======
+	#ifdef LOG_DLL_ENABLED
+		log_print_stack_string(LOG_DLL, "DLL Starting channel scan series");
+	#endif
+>>>>>>> master
 
 }
 
@@ -631,7 +726,11 @@ static void scan_timeout()
 
 	if (current_css == NULL)
 	{
+<<<<<<< HEAD
 		return;
+=======
+		log_print_stack_string(LOG_DLL, "DLL Starting channel scan FAILED");
+>>>>>>> master
 	}
 
 	//Channel scan series
@@ -750,6 +849,7 @@ static void rx_callback(phy_rx_data_t* res)
 			frame->dlls_header = NULL;
 		}
 
+<<<<<<< HEAD
 		if (frame->frame_header.frame_ctl & 0x20) // Enable Addressing
 		{
 			// Address Control Header
@@ -760,6 +860,17 @@ static void rx_callback(phy_rx_data_t* res)
 			frame->address_ctl->flags = *data_pointer;
 			data_pointer++;
 			//data_pointer += sizeof(uint8_t*);
+=======
+	if (params->listen) frame->frame_header.frame_ctl |= FRAME_CTL_LISTEN;
+
+	if (params->security != NULL)
+	{
+		#ifdef LOG_DLL_ENABLED
+			log_print_stack_string(LOG_DLL, "DLL: security not implemented");
+		#endif
+		//frame->frame_header.frame_ctl |= FRAME_CTL_DLLS;
+	}
+>>>>>>> master
 
 			uint8_t addressing = (frame->address_ctl->flags & 0xC0) >> 6;
 			uint8_t vid = (frame->address_ctl->flags & 0x20) >> 5;

@@ -31,7 +31,7 @@ static void control_tx_callback(Dll_Tx_Result Result)
 	switch(Result){
 			case DLLTxResultOK:
 				#ifdef LOG_TRANS_ENABLED
-					log_print_string("Trans: Packet is sent");
+				log_print_stack_string(LOG_TRANS, "Trans: Packet is sent");
 				#endif
 				trans_tx_callback(TransPacketSent);
 				break;
@@ -42,13 +42,13 @@ static void control_tx_callback(Dll_Tx_Result Result)
 			case DLLTxResultCCA2Fail:
 				trans_rigd_ccp(current__spectrum_id, false, true);
 				#ifdef LOG_TRANS_ENABLED
-					log_print_string("Trans: CCA fail");
+				log_print_stack_string(LOG_TRANS, "Trans: CCA fail");
 				#endif
 				break;
 			case DLLTxResultFail:
 				trans_tx_callback(TransPacketFail);
 				#ifdef LOG_TRANS_ENABLED
-					log_print_string("Trans: Fail to sent");
+				log_print_stack_string(LOG_TRANS, "Trans: Fail to sent");
 				#endif
 				break;
 		}
@@ -113,12 +113,19 @@ void trans_rigd_ccp(uint8_t spectrum_id, bool init_status, bool wait_for_t_ca_ti
 		n_time = (n_time / 32767) * current__t_ca; // Random Time before the CCA will be executed
 		temp_time = (int)n_time;
 
+		#ifdef LOG_TRANS_ENABLED
+		log_print_stack_string(LOG_TRANS, "RIGD: Wait Random Time: %d", temp_time);
+		#endif
+
 		event.next_event = temp_time; // Wait random time (0 - new__t_ca)
 		event.f = &final_rigd;
 		last_ca = timer_get_counter_value();
 		timer_add_event(&event);
 	}
 	else{
+		#ifdef LOG_TRANS_ENABLED
+		log_print_stack_string(LOG_TRANS, "RIGD: Failed");
+		#endif
 		trans_tx_callback(TransTCAFail);
 		return;
 	}

@@ -94,7 +94,7 @@ void nwl_build_network_protocol_data(uint8_t* data, uint8_t length, nwl_security
 	if (security != NULL)
 	{
 		#ifdef LOG_NWL_ENABLED
-			log_print_string("NWL: security not implemented");
+		log_print_stack_string(LOG_NWL, "NWL: security not implemented");
 		#endif
 
 		//dll_params.nwl_security = true;
@@ -106,7 +106,7 @@ void nwl_build_network_protocol_data(uint8_t* data, uint8_t length, nwl_security
 	if (routing != NULL)
 	{
 		#ifdef LOG_NWL_ENABLED
-			log_print_string("NWL: routing not implemented");
+		log_print_stack_string(LOG_NWL, "NWL: routing not implemented");
 		#endif
 	}
 
