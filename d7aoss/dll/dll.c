@@ -183,7 +183,6 @@ void dll_background_scan()
 void dll_foreground_scan()
 {
 	#ifdef LOG_DLL_ENABLED
-<<<<<<< HEAD
 		log_print_stack_string(LOG_DLL, "Starting foreground scan");
 	#endif
 
@@ -202,13 +201,11 @@ void dll_foreground_scan()
 	bool phy_rx_result = phy_rx(&rx_cfg);
 	if (!phy_rx_result)
 	{
-		log_print_string("DLL Starting channel scan FAILED");
+		log_print_stack_string(LOG_DLL, "DLL Starting channel scan FAILED");
 	}
 	#else
 	phy_rx(&rx_cfg);
-=======
-		log_print_stack_string(LOG_DLL, "DLL TX OK");
->>>>>>> master
+	log_print_stack_string(LOG_DLL, "DLL TX OK");
 	#endif
 }
 
