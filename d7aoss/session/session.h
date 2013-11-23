@@ -43,5 +43,6 @@ void session_init();
 session_data* session_new(uint16_t counter, uint8_t channel);
 void session_pop();
 session_data* session_top();
+void session_tx(task *session_task);
 
 #endif /* SESSION_H_ */

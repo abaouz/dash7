@@ -67,7 +67,7 @@ int main(void) {
 
 	while(1)
 	{
-		system_lowpower_mode(4,1);
+		system_lowpower_mode(3,1);
 	}
 }
 

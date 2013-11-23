@@ -519,6 +519,8 @@ void dll_create_beacon(task *beacon_task)
 	}
 
 	nwl_build_network_protocol_footer(session);
+
+	system_core_set_task(TASK_PROCESS_SESSION, 0, 1, 0);
 }
 
 void dll_build_foreground_frame_header(session_data *session, d7a_frame_type frame_type, uint8_t addressing, uint8_t* destination)

@@ -10,8 +10,9 @@
 
 #include "framework/queue.h"
 
-#define TASK_QUEUE_LENGTH 1
+#define TASK_QUEUE_LENGTH 2
 #define TASK_BEACON 0
+#define TASK_PROCESS_SESSION 1
 
 typedef struct
 {

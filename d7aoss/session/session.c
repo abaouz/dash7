@@ -83,6 +83,10 @@ session_data* session_top()
 {
 	if (session_stack_top < 0) return NULL;
 	return &session_stack[session_stack_top];
+}
 
+void session_tx(task *session_task)
+{
+	session_data* session_top();
 
 }

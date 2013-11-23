@@ -32,6 +32,9 @@ void system_core_init()
 	tasks[TASK_BEACON].active = false;
 	tasks[TASK_BEACON].handle = &sys_beacon_task;
 
+	tasks[TASK_PROCESS_SESSION].active = false;
+	tasks[TASK_PROCESS_SESSION].handle = &sys_tx_sessions;
+
 	task_timer.f = &sys_handle_timer_event;
 }
 
@@ -79,10 +82,15 @@ void system_core_dissable_task(uint8_t task_id)
 	tasks[task_id].active = false;
 }
 
-
+// System tasks
 static void sys_beacon_task()
 {
 	dll_create_beacon(&tasks[TASK_BEACON]);
+}
+
+static void sys_tx_sessions()
+{
+	session_tx(&tasks[TASK_BEACON]);
 }
 
 static void sys_schedule_next_task()

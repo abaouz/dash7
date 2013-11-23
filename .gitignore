@@ -15,3 +15,5 @@ lnk_*.cmd
 moc*.cpp
 
 targetConfigs
+Thumbs.db
+build
