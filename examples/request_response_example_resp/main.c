@@ -58,7 +58,7 @@ static volatile uint8_t adc12_data_ready;
 void start_rx()
 {
 	start_channel_scan = false;
-	trans_rx_query_start(0xFF, receive_channel);
+	trans_rx_query_start(0xFF, receive_channel, 0);
 }
 
 void get_temperature()

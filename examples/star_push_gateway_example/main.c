@@ -52,7 +52,7 @@ static uint8_t receive_channel[2] = {0x04, 0x00};
 void start_rx()
 {
 	start_channel_scan = false;
-	trans_rx_query_start(0xFF, receive_channel);
+	trans_rx_query_start(0xFF, receive_channel, 0);
 }
 
 void rx_callback(Trans_Rx_Alp_Result* rx_res)

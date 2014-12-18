@@ -279,17 +279,18 @@ static void timer_wait_done( void )
  **********************************/
 void timer_wait_ms( uint32_t ms )
 {
-    /*
+
     timer_wait.next_event = (int32_t)((ms*1024)/1000);
     timer_add_event( &timer_wait );
     while(waiting);
     waiting = true;
-    */
     
+    /*
     uint32_t i;
     for( i=0 ; i<ms ; i++ )
     {
             volatile uint32_t n = 3200;
             while(n--);
     }
+    */
 }

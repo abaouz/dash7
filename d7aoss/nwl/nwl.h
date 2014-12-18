@@ -173,6 +173,7 @@ void nwl_build_advertising_protocol_data(uint16_t eta, uint8_t spectrum_id[2], i
 void nwl_build_network_protocol_data(uint8_t control, nwl_security* security, nwl_full_access_template* source_access, uint8_t* target_address, uint8_t target_address_lenght, uint8_t subnet, uint8_t spectrum_id[2], int8_t tx_eirp);
 //void nwl_build_datastream_protocol_data(uint8_t* data, uint8_t length, nwl_security* security, uint8_t subnet, uint8_t spectrum_id, int8_t tx_eirp, uint8_t dialog_id);
 
-void nwl_rx_start(uint8_t subnet, uint8_t spectrum_id[2], Protocol_Type type);
+/** \copydoc nwl_rx_start */
+void nwl_rx_start(uint8_t subnet, uint8_t spectrum_id[2], Protocol_Type type, uint16_t timeout);
 void nwl_rx_stop();
 #endif

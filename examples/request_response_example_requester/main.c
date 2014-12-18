@@ -187,7 +187,7 @@ int main(void) {
 		{
 			wait_for_response = false;
 			log_print_string("Starting RX");
-			trans_rx_query_start(0xFF, send_channel);
+			trans_rx_query_start(0xFF, send_channel, 0);
 		}
 
 		if (add_tx_event)

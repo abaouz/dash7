@@ -58,6 +58,10 @@ static void nwl_rx_callback(nwl_rx_res_t* result)
 
 	if (result->protocol_type == ProtocolTypeNetworkProtocol)
 	{
+		#ifdef LOG_TRANS_ENABLED
+		log_print_stack_string(LOG_TRANS, "Trans: NetwP received");
+		#endif
+
 		nwl_ff_D7ANP_t* data = (nwl_ff_D7ANP_t*) result->data;
 		D7AQP_Command command;
 
@@ -89,6 +93,26 @@ static void nwl_rx_callback(nwl_rx_res_t* result)
 			trans_rx_alp_callback(&alp_result);
 		}
 
+
+	} else if (result->protocol_type = ProtocolTypeAdvertisementProtocol)
+	{
+		nwl_background_frame_t* frame = (nwl_background_frame_t*) result->data;
+		if (frame->bpid == BPID_AdvP)
+		{
+			dll_stop_channel_scan();
+
+			uint16_t eta = MERGEUINT16(frame->protocol_data[0], frame->protocol_data[1]);
+			#ifdef LOG_TRANS_ENABLED
+			log_print_stack_string(LOG_TRANS, "Trans: AdvP received, eta: %d ti", eta);
+			#endif
+
+			timer_event event_ff;
+			event_ff.next_event = eta < 100 ? 0:  eta - 100;
+			dll_set_foreground_scan_detection_timeout(200);
+			event_ff.f = &dll_foreground_scan;
+
+			timer_add_event(&event_ff);
+		}
 
 	}
 
@@ -247,12 +271,23 @@ void trans_tx_query(D7AQP_Query_Template* query,  uint8_t subnet, uint8_t spectr
 //	nwl_rx_start(subnet, spectrum_id, ProtocolTypeDatastreamProtocol);
 //}
 
-
-void trans_rx_query_start(uint8_t subnet, uint8_t spectrum_id[2])
+/*! \brief Start listening for D7AQP Query (transport layer)
+ *
+ *  Initates listening for an Query on the specific spectrum id
+ *
+ *  \param subnet The subnet which needs to be used to send the query
+ *  \param spectrum_id The spectrum_id which needs to be used to send the query
+ *  \param timeout The timeout in ticks after which the liseting is stopped (0 means keep listening)
+ */
+void trans_rx_query_start(uint8_t subnet, uint8_t spectrum_id[2], uint16_t timeout)
 {
-	nwl_rx_start(subnet, spectrum_id, ProtocolTypeNetworkProtocol);
+	nwl_rx_start(subnet, spectrum_id, ProtocolTypeNetworkProtocol, timeout);
 }
 
+/*! \brief Stops listening for D7AQP Query (transport layer)
+ *
+ *  Stops listening for an Query
+ */
 void trans_rx_stop()
 {
 	nwl_rx_stop();

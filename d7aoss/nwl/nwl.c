@@ -309,15 +309,23 @@ void nwl_build_network_protocol_data(uint8_t control, nwl_security* security, nw
 //	dll_create_frame(dll_data, dll_data_length, NULL, 0, &dll_params);
 //}
 
-
-void nwl_rx_start(uint8_t subnet, uint8_t spectrum_id[2], Protocol_Type type)
+/*! \brief Start listening for network layer frame (network layer)
+ *
+ *  Initates listening for an frame on the specific spectrum id
+ *
+ *  \param subnet The subnet which needs to be used to send the query
+ *  \param spectrum_id The spectrum_id which needs to be used to send the query
+ *  \param type the Protocol_Type to which the device has to listen (network protocol or advertisement protocol)
+ *  \param timeout The timeout in ticks after which the liseting is stopped (0 means keep listening)
+ */
+void nwl_rx_start(uint8_t subnet, uint8_t spectrum_id[2], Protocol_Type type, uint16_t timeout)
 {
 
 
 	scan_cfg.spectrum_id[0] = spectrum_id[0];
 	scan_cfg.spectrum_id[1] = spectrum_id[1];
 	scan_cfg.time_next_scan = 0;
-	scan_cfg.timeout_scan_detect = 0;
+	scan_cfg.timeout_scan_detect = timeout;
 
 
 	if (type != ProtocolTypeNetworkProtocol)

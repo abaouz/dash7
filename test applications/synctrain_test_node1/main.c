@@ -232,7 +232,7 @@ int main(void) {
 	event.next_event = SEND_INTERVAL_MS;
 	event.f = &start_tx;
 
-		alp_template.op = ALP_OP_RESP_DATA;
+	alp_template.op = ALP_OP_RESP_DATA;
 	alp_template.data = (uint8_t*) &data_template;
 
 	data_template.file_id = 32;
