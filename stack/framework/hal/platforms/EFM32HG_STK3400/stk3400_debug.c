@@ -44,7 +44,7 @@ void HardFault_Handler(void) {
     );
 }
 
-#ifdef PLATFORM_GECKO_DEBUGPINS
+#ifdef PLATFORM_EFM32HG_STK3400_DEBUGPINS
 
 #if DEBUG_PIN_NUM != 4
 	#error DEBUG_PIN_NUM does not match the expected value. Update platform.h or platform_debug.c
