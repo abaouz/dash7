@@ -73,8 +73,8 @@ void execute_sensor_measurement()
 
 #ifdef PLATFORM_EFM32HG_STK3400
   float internal_temp = hw_get_internal_temperature();
-  lcd_write_string("Int T: %2d.%d C\n", (int)internal_temp, (int)(internal_temp*10)%10);
-  log_print_string("Int T: %2d.%d C\n", (int)internal_temp, (int)(internal_temp*10)%10);
+  lcd_write_string("Int T: %2d.%1d C\n", (int)internal_temp, (int)(internal_temp*10)%10);
+  log_print_string("Int T: %2d.%1d C\n", (int)internal_temp, (int)(internal_temp*10)%10);
 #endif
 
 #if (defined PLATFORM_EFM32HG_STK3400  || defined PLATFORM_EZR32LG_WSTK6200A)
