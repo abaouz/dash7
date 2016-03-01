@@ -26,9 +26,10 @@ PLATFORM_PARAM(${PLATFORM_PREFIX}_RADIO "none" STRING "The radio chip connected 
 SET(JLINK_DEVICE ${${PLATFORM_PREFIX}_MCU} CACHE STRING "The device passed to JLinkExe for flashing")
 
 # CONSOLE
-# uses UART0, location 2
+# uses UART 1, location 4
 PLATFORM_PARAM(${PLATFORM_PREFIX}_CONSOLE_UART     "1"      STRING "The UART channel used by the console UART configuration."   )
 PLATFORM_PARAM(${PLATFORM_PREFIX}_CONSOLE_LOCATION "4"      STRING "The route location used by the console UART configuration." )
+
 PLATFORM_PARAM(${PLATFORM_PREFIX}_CONSOLE_BAUDRATE "115200" STRING "The baudrate used by the second console configuration."       )
 
 PLATFORM_OPTION(${PLATFORM_PREFIX}_DEBUGPINS "Enable/Disable Hardware Debug Pins support (see 'hwdebug.h')" TRUE)

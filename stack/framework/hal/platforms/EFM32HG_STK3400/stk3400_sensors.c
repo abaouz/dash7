@@ -118,4 +118,3 @@ void getHumidityAndTemperature(uint32_t *rhData, int32_t *tData)
 	Si7013_MeasureRHAndTemp((I2C_TypeDef*) (i2c->channel), SI7021_ADDR, rhData, tData);
 	//GPIO_PinOutClear(gpioPortC, 8);
 }
-
