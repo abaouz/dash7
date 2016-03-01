@@ -119,7 +119,3 @@ void getHumidityAndTemperature(uint32_t *rhData, int32_t *tData)
 	//GPIO_PinOutClear(gpioPortC, 8);
 }
 
-
-
-
-
