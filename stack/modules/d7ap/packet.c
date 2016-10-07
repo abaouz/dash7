@@ -52,15 +52,22 @@ void packet_init(packet_t* packet)
 void packet_assemble(packet_t* packet)
 {
     uint8_t* data_ptr = packet->hw_radio_packet.data + 1; // skip length field for now, we fill this later
+    uint8_t* nwl_payload;
 
     data_ptr += dll_assemble_packet_header(packet, data_ptr);
 
     data_ptr += d7anp_assemble_packet_header(packet, data_ptr);
+    nwl_payload = data_ptr;
 
     data_ptr += d7atp_assemble_packet_header(packet, data_ptr);
 
     // add payload
     memcpy(data_ptr, packet->payload, packet->payload_length); data_ptr += packet->payload_length;
+
+    /* Encrypt/authenticate nwl_payload if needed */
+    if (packet->d7anp_ctrl.nls_enabled)
+        data_ptr += d7anp_secure_payload(packet, nwl_payload, data_ptr - nwl_payload);
+
     packet->hw_radio_packet.length = data_ptr - packet->hw_radio_packet.data - 1 + 2; // exclude the length byte and add CRC bytes
     packet->hw_radio_packet.data[0] = packet->hw_radio_packet.length;
 
