@@ -222,9 +222,10 @@ void d7anp_tx_foreground_frame(packet_t* packet, bool should_include_origin_temp
     packet->d7anp_security.frame_counter++;
     DPRINT("Key counter %d", packet->d7anp_security.key_counter);
     DPRINT("Frame counter %ld", packet->d7anp_security.frame_counter);
+
+    packet->d7anp_ctrl.extension = true;
     // For now, hard code the security method
-    packet->d7anp_security.ctrl = SET_NLS_METHOD(AES_CCM_128);
-    packet->d7anp_ctrl.nls_enabled = true;
+    packet->d7anp_ext.raw = SET_NLS_METHOD(AES_CCM_128);
 
     switch_state(D7ANP_STATE_TRANSMIT);
     dll_tx_frame(packet, access_profile);
@@ -260,31 +261,32 @@ static void build_header(packet_t *packet, uint8_t payload_len, uint8_t *header)
     memset(header, 0, AES_BLOCK_SIZE); // for zero padding
 
     /* the CBC-MAC header is defined according Table 7.6.4.1 */
-    header[0] = payload_len;
-    header[1] = packet->d7anp_ctrl.raw;
+    header[0] = packet->d7anp_ext.raw;
+    header[1] = packet->d7anp_listen_timeout;
     /* When Origin ID is not provided in the NWL frame, it is provided by upper layer.*/
-    memcpy( header + 2, packet->origin_access_id, packet->d7anp_ctrl.origin_addressee_ctrl_id_type == ID_TYPE_VID? 2 : 8);
-    header[15] = packet->d7anp_security.ctrl;
+    memcpy( header + 6, packet->origin_access_id, packet->d7anp_ctrl.origin_addressee_ctrl_id_type == ID_TYPE_VID? 2 : 8);
+    header[14] = packet->d7anp_ctrl.raw;
+    header[15] = payload_len;
 
     DPRINT("Header for CBC-MAC");
     DPRINT_DATA(header, AES_BLOCK_SIZE);
 }
 
-static void build_ctr_blk(packet_t *packet, uint8_t payload_len, uint8_t *ctr_blk)
+static void build_iv(packet_t *packet, uint8_t payload_len, uint8_t *iv)
 {
-    memset(ctr_blk, 0, AES_BLOCK_SIZE);
+    memset(iv, 0, AES_BLOCK_SIZE);
 
-    /* AES-CTR Initialization Vector (IV)*/
-    ctr_blk[0] = payload_len;
-    ctr_blk[1] = packet->d7anp_ctrl.raw;
+    /* AES-CTR/AES-CCM Initialization Vector (IV)*/
+    iv[0] = SET_NLS_METHOD(packet->d7anp_ext.nls_method);
+    iv[1] = packet->d7anp_security.key_counter;
+    write_be32(&iv[2], packet->d7anp_security.frame_counter);
     /* When Origin ID is not provided in the NWL frame, it is provided by upper layer.*/
-    memcpy( ctr_blk + 2, packet->origin_access_id, packet->d7anp_ctrl.origin_addressee_ctrl_id_type == ID_TYPE_VID? 2 : 8);
-    write_be32(&ctr_blk[10], packet->d7anp_security.frame_counter);
-    ctr_blk[14] = packet->d7anp_security.key_counter;
-    ctr_blk[15] = packet->d7anp_security.ctrl;
+    memcpy( iv + 6, packet->origin_access_id, packet->d7anp_ctrl.origin_addressee_ctrl_id_type == ID_TYPE_VID? 2 : 8);
+    iv[14] = packet->d7anp_ctrl.raw;
+    iv[15] = payload_len;
 
-    DPRINT("Counter block for CTR");
-    DPRINT_DATA(ctr_blk, AES_BLOCK_SIZE);
+    DPRINT("iv for CTR/CCM");
+    DPRINT_DATA(iv, AES_BLOCK_SIZE);
 }
 
 uint8_t d7anp_secure_payload(packet_t *packet, uint8_t *payload, uint8_t payload_len)
@@ -295,14 +297,14 @@ uint8_t d7anp_secure_payload(packet_t *packet, uint8_t *payload, uint8_t payload
     uint8_t auth[AES_BLOCK_SIZE];
     uint8_t auth_len;
 
-    nls_method = GET_NLS_METHOD(packet->d7anp_security.ctrl);
+    nls_method = packet->d7anp_ext.nls_method;
     auth_len = get_auth_len(nls_method);
 
     switch (nls_method)
     {
     case AES_CTR:
         // Build the initial counter block
-        build_ctr_blk(packet, payload_len, ctr_blk);
+        build_iv(packet, payload_len, ctr_blk);
 
         // the encrypted payload replaces the plaintext
         AES128_CTR_encrypt(payload, payload, payload_len, ctr_blk);
@@ -322,9 +324,9 @@ uint8_t d7anp_secure_payload(packet_t *packet, uint8_t *payload, uint8_t payload
     case AES_CCM_128:
     case AES_CCM_64:
     case AES_CCM_32:
-        // Build the header block and the counter block for CCM
-        build_header(packet, payload_len, header);
-        build_ctr_blk(packet, payload_len, ctr_blk);
+        /* For CCM, the same IV is used for the header block and the counter block */
+        build_iv(packet, payload_len, header);
+        memcpy(ctr_blk, header, AES_BLOCK_SIZE);
 
         // TODO check that the payload length does not exceed the maximum size
         AES128_CCM_encrypt(payload, payload_len, header, NULL, 0, ctr_blk, auth_len);
@@ -358,13 +360,14 @@ uint8_t d7anp_assemble_packet_header(packet_t *packet, uint8_t *data_ptr)
         }
     }
 
-    if (packet->d7anp_ctrl.nls_enabled)
+    if (packet->d7anp_ctrl.extension && packet->d7anp_ext.nls_method)
     {
-        uint8_t nls_method;
+        uint8_t nls_method = packet->d7anp_ext.nls_method;
+
+        /* set the extension byte */
+        (*data_ptr) = packet->d7anp_ext.raw; data_ptr++;
 
         /* set the security header */
-        (*data_ptr) = packet->d7anp_security.ctrl; data_ptr++;
-        nls_method = GET_NLS_METHOD(packet->d7anp_security.ctrl);
         if (nls_method == AES_CTR || nls_method == AES_CCM_32 ||
             nls_method == AES_CCM_64 || nls_method == AES_CCM_128)
         {
@@ -381,6 +384,8 @@ uint8_t d7anp_assemble_packet_header(packet_t *packet, uint8_t *data_ptr)
 
 bool d7anp_disassemble_packet_header(packet_t* packet, uint8_t *data_idx)
 {
+    bool security_enabled = false;
+
     packet->d7anp_listen_timeout = packet->hw_radio_packet.data[(*data_idx)]; (*data_idx)++;
     packet->d7anp_ctrl.raw = packet->hw_radio_packet.data[(*data_idx)]; (*data_idx)++;
 
@@ -390,20 +395,25 @@ bool d7anp_disassemble_packet_header(packet_t* packet, uint8_t *data_idx)
         memcpy(packet->origin_access_id, packet->hw_radio_packet.data + (*data_idx), origin_access_id_size); (*data_idx) += origin_access_id_size;
     }
 
-    if (packet->d7anp_ctrl.nls_enabled)
+    if (packet->d7anp_ctrl.extension)
+    {
+        packet->d7anp_ext.raw = packet->hw_radio_packet.data[(*data_idx)]; (*data_idx)++;
+        if (packet->d7anp_ext.nls_method)
+            security_enabled = true;
+    }
+
+    if (security_enabled)
     {
         uint8_t nls_method;
         uint8_t ctr_blk[AES_BLOCK_SIZE];
         uint8_t header[AES_BLOCK_SIZE];
         uint8_t auth[AES_BLOCK_SIZE];
         uint8_t auth_len;
-        uint32_t payload_length;
+        uint32_t payload_len;
         uint8_t *tag;
 
-        // we need to determine first the security method
-        packet->d7anp_security.ctrl = packet->hw_radio_packet.data[(*data_idx)]; (*data_idx)++;
-        nls_method = GET_NLS_METHOD(packet->d7anp_security.ctrl);
-        DPRINT("received nls method %d", nls_method);
+        nls_method = packet->d7anp_ext.nls_method;
+        DPRINT("Received nls method %d", nls_method);
 
         if (nls_method == AES_CTR || nls_method == AES_CCM_32 ||
             nls_method == AES_CCM_64 || nls_method == AES_CCM_128)
@@ -416,15 +426,15 @@ bool d7anp_disassemble_packet_header(packet_t* packet, uint8_t *data_idx)
             DPRINT("Received key counter <%d>, frame counter <%ld>", packet->d7anp_security.key_counter, packet->d7anp_security.frame_counter);
         }
 
-        payload_length = packet->hw_radio_packet.length + 1 - (*data_idx) - 2; // exclude the headers CRC bytes // TODO exclude footers
+        payload_len = packet->hw_radio_packet.length + 1 - (*data_idx) - 2; // exclude the headers CRC bytes // TODO exclude footers
         auth_len = get_auth_len(nls_method); // the authentication length is given in bytes
 
         /* remove the authentication tag from the payload length if relevant */
-        payload_length -= auth_len;
+        payload_len -= auth_len;
 
         if (auth_len)
         {
-            tag = packet->hw_radio_packet.data + (*data_idx) + payload_length;
+            tag = packet->hw_radio_packet.data + (*data_idx) + payload_len;
             DPRINT("Tag  <%d>", auth_len);
             DPRINT_DATA(tag, auth_len);
         }
@@ -433,22 +443,22 @@ bool d7anp_disassemble_packet_header(packet_t* packet, uint8_t *data_idx)
         {
         case AES_CTR:
             /* Build the initial counter block */
-            build_ctr_blk(packet, payload_length, ctr_blk);
+            build_iv(packet, payload_len, ctr_blk);
 
             // the decrypted payload replaces the encrypted data
             AES128_CTR_encrypt(packet->hw_radio_packet.data + (*data_idx),
                                packet->hw_radio_packet.data + (*data_idx),
-                               payload_length, ctr_blk);
+							   payload_len, ctr_blk);
             break;
         case AES_CBC_MAC_128:
         case AES_CBC_MAC_64:
         case AES_CBC_MAC_32:
             /* Build the header block to prepend to the payload */
-            build_header(packet, payload_length, header);
+            build_header(packet, payload_len, header);
 
             /* Compute the CBC-MAC and check the authentication Tag */
             AES128_CBC_MAC(auth, packet->hw_radio_packet.data + (*data_idx),
-                            payload_length, header, NULL, 0, auth_len);
+                           payload_len, header, NULL, 0, auth_len);
 
             if (memcmp(auth, tag, auth_len) != 0)
             {
@@ -462,12 +472,12 @@ bool d7anp_disassemble_packet_header(packet_t* packet, uint8_t *data_idx)
         case AES_CCM_128:
         case AES_CCM_64:
         case AES_CCM_32:
-            /* Build the header block and the counter block for CCM */
-            build_header(packet, payload_length, header);
-            build_ctr_blk(packet, payload_length, ctr_blk);
+            /* For CCM, the same IV is used for the header block and the counter block */
+            build_iv(packet, payload_len, header);
+            memcpy(ctr_blk, header, AES_BLOCK_SIZE);
 
             if (AES128_CCM_decrypt(packet->hw_radio_packet.data + (*data_idx),
-                                   payload_length, header, NULL, 0, ctr_blk,
+                                   payload_len, header, NULL, 0, ctr_blk,
                                    tag, auth_len) != 0)
                 return false;
 

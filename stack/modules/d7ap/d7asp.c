@@ -313,7 +313,7 @@ bool d7asp_process_received_packet(packet_t* packet, bool extension)
         .target_rx_level = 80, // TODO not implemented yet, use default for now
         .status = {
             .ucast = 0, // TODO
-            .nls = packet->d7anp_ctrl.nls_enabled,
+            .nls = (packet->d7anp_ctrl.extension? packet->d7anp_ext.nls_method : 0),
             .retry = false, // TODO
             .missed = false, // TODO
         },

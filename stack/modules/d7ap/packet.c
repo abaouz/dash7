@@ -65,7 +65,7 @@ void packet_assemble(packet_t* packet)
     memcpy(data_ptr, packet->payload, packet->payload_length); data_ptr += packet->payload_length;
 
     /* Encrypt/authenticate nwl_payload if needed */
-    if (packet->d7anp_ctrl.nls_enabled)
+    if (packet->d7anp_ctrl.extension && packet->d7anp_ext.nls_method)
         data_ptr += d7anp_secure_payload(packet, nwl_payload, data_ptr - nwl_payload);
 
     packet->hw_radio_packet.length = data_ptr - packet->hw_radio_packet.data - 1 + 2; // exclude the length byte and add CRC bytes

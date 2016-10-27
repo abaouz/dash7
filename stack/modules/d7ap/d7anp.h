@@ -83,16 +83,25 @@ typedef struct {
             uint8_t origin_addressee_ctrl_access_class : 4;
             id_type_t origin_addressee_ctrl_id_type : 2;
             bool hop_enabled : 1;
-            bool nls_enabled : 1;
+            bool extension : 1;
         };
     };
 } d7anp_ctrl_t;
 
 typedef struct {
-    uint8_t ctrl;
     uint8_t key_counter;
     uint32_t frame_counter;
 } d7anp_security_t;
+
+typedef struct {
+    union {
+        uint8_t raw;
+        struct {
+            uint8_t ori_mask   : 4;
+            uint8_t nls_method : 4;
+        };
+    };
+} d7anp_ext_t;
 
 void d7anp_init();
 void d7anp_tx_foreground_frame(packet_t* packet, bool should_include_origin_template, dae_access_profile_t* access_profile, uint8_t slave_listen_timeout_ct);

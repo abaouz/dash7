@@ -41,6 +41,7 @@ struct packet
     uint8_t d7anp_listen_timeout;
     d7anp_ctrl_t d7anp_ctrl;
     uint8_t origin_access_id[8];
+    d7anp_ext_t d7anp_ext;
     d7anp_security_t d7anp_security;
     d7atp_ctrl_t d7atp_ctrl;
     d7anp_addressee_t* d7anp_addressee;
