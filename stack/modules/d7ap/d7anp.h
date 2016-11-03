@@ -103,6 +103,13 @@ typedef struct {
     };
 } d7anp_ext_t;
 
+typedef struct {
+    uint8_t key_counter;
+    uint32_t frame_counter;
+    uint8_t addr[8];
+    bool used;
+} d7anp_node_t;
+
 void d7anp_init();
 void d7anp_tx_foreground_frame(packet_t* packet, bool should_include_origin_template, dae_access_profile_t* access_profile, uint8_t slave_listen_timeout_ct);
 uint8_t d7anp_assemble_packet_header(packet_t* packet, uint8_t* data_ptr);

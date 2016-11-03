@@ -100,7 +100,7 @@ error_t AES128_CBC_MAC( uint8_t *auth, uint8_t *payload, uint8_t length, const u
 
     /* X_1 = E(K, B_0) */
     DPRINT("Blk0");
-    DPRINT_DATA(iv, AES_BLOCK_SIZE);
+    DPRINT_DATA((uint8_t *)iv, AES_BLOCK_SIZE);
     AES128_ECB_encrypt((uint8_t *)iv, tag);
     DPRINT("X_1 = AES(B_0)");
     DPRINT_DATA(tag, AES_BLOCK_SIZE);

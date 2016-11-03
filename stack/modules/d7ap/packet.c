@@ -76,10 +76,10 @@ void packet_assemble(packet_t* packet)
     // add CRC - SW CRC when using FEC
     if (!has_hardware_crc || packet->hw_radio_packet.tx_meta.tx_cfg.channel_id.channel_header.ch_coding == PHY_CODING_FEC_PN9)
     {
-    	DPRINT_DATA_DLL(packet->hw_radio_packet.data, packet->hw_radio_packet.length + 1); // TODO tmp
-    	uint16_t crc = __builtin_bswap16(crc_calculate(packet->hw_radio_packet.data, packet->hw_radio_packet.length + 1 - 2));
-    	memcpy(data_ptr, &crc, 2);
-    	DPRINT_DATA_DLL(packet->hw_radio_packet.data, packet->hw_radio_packet.length + 1); // TODO tmp
+        DPRINT_DATA_DLL(packet->hw_radio_packet.data, packet->hw_radio_packet.length + 1); // TODO tmp
+        uint16_t crc = __builtin_bswap16(crc_calculate(packet->hw_radio_packet.data, packet->hw_radio_packet.length + 1 - 2));
+        memcpy(data_ptr, &crc, 2);
+        DPRINT_DATA_DLL(packet->hw_radio_packet.data, packet->hw_radio_packet.length + 1); // TODO tmp
     }
 
 }
