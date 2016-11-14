@@ -208,7 +208,7 @@ void d7anp_init()
 #endif
 }
 
-void d7anp_tx_foreground_frame(packet_t* packet, bool should_include_origin_template, dae_access_profile_t* access_profile, uint8_t slave_listen_timeout_ct)
+error_t d7anp_tx_foreground_frame(packet_t* packet, bool should_include_origin_template, dae_access_profile_t* access_profile, uint8_t slave_listen_timeout_ct)
 {
     assert(d7anp_state == D7ANP_STATE_IDLE || d7anp_state == D7ANP_STATE_FOREGROUND_SCAN);
 
@@ -233,6 +233,11 @@ void d7anp_tx_foreground_frame(packet_t* packet, bool should_include_origin_temp
     packet->d7anp_listen_timeout = slave_listen_timeout_ct;
 
 #if defined(MODULE_D7AP_NLS_ENABLED)
+
+    /* Check if frame counter reaches its maximum value */
+    if (security_state.frame_counter == (uint32_t)~0)
+        return EPERM;
+
     packet->d7anp_ctrl.extension = true;
     // For now, hard code the security method
     packet->d7anp_ext.raw = SET_NLS_METHOD(AES_CCM_128);
@@ -246,6 +251,7 @@ void d7anp_tx_foreground_frame(packet_t* packet, bool should_include_origin_temp
 
     switch_state(D7ANP_STATE_TRANSMIT);
     dll_tx_frame(packet, access_profile);
+    return SUCCESS;
 }
 
 void start_foreground_scan_after_D7AAdvP()
@@ -501,7 +507,7 @@ d7anp_node_t* add_trusted_node(uint8_t *address, uint32_t frame_counter, uint8_t
         }
     }
 
-    assert(false); // should not happen, possible to small NODE_TABLE_SIZE
+    assert(false); // should not happen, possible too small NODE_TABLE_SIZE
 }
 
 bool d7anp_disassemble_packet_header(packet_t* packet, uint8_t *data_idx)
@@ -563,10 +569,10 @@ bool d7anp_disassemble_packet_header(packet_t* packet, uint8_t *data_idx)
 
             if (node == NULL)
                 create_node = true;
-            else{
-            	DPRINT("Found node %p! frame counter %ld", node, node->frame_counter);
-            	node->frame_counter = packet->d7anp_security.frame_counter;
-            	DPRINT("node frame counter updated to %ld", node->frame_counter);
+            else
+            {
+                node->frame_counter = packet->d7anp_security.frame_counter;
+                DPRINT("Found node %p! frame counter updated to %ld", node, node->frame_counter);
             }
         }
 

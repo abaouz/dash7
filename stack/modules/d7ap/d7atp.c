@@ -217,7 +217,7 @@ void d7atp_init()
     sched_register_task(&response_period_timeout_handler);
 }
 
-void d7atp_send_request(uint8_t dialog_id, uint8_t transaction_id, bool is_last_transaction, packet_t* packet, session_qos_t* qos_settings)
+error_t d7atp_send_request(uint8_t dialog_id, uint8_t transaction_id, bool is_last_transaction, packet_t* packet, session_qos_t* qos_settings)
 {
     /* check that we are not initiating a different dialog if a dialog is still ongoing */
     if (current_dialog_id)
@@ -246,7 +246,7 @@ void d7atp_send_request(uint8_t dialog_id, uint8_t transaction_id, bool is_last_
     uint8_t slave_listen_timeout = packet->d7atp_tc; // TODO for now we keep this the same as Tc (ie don't cater for transaction retries) this probably needs to be managed from upper layer
     d7anp_set_foreground_scan_timeout(CONVERT_TO_TI(packet->d7atp_tc)); // only slave nodes need to be locked on the NWL channel longer than Tc, requester only used Tc timer
 
-    d7anp_tx_foreground_frame(packet, true, &active_addressee_access_profile, slave_listen_timeout);
+    return(d7anp_tx_foreground_frame(packet, true, &active_addressee_access_profile, slave_listen_timeout));
 }
 
 void d7atp_send_response(packet_t* packet)

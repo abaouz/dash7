@@ -120,6 +120,8 @@ static void flush_completed() {
 
 static void flush_fifos()
 {
+    error_t ret;
+
     assert(d7asp_state == D7ASP_STATE_MASTER);
     DPRINT("Flushing FIFOs");
     hw_watchdog_feed(); // TODO do here?
@@ -180,7 +182,13 @@ static void flush_fifos()
     }
 
     // TODO calculate D7ANP timeout (and update during transaction lifetime) (based on Tc, channel, cs, payload size, # msgs, # retries)
-    d7atp_send_request(current_master_session.token, current_request_id, (current_request_id == current_master_session.next_request_id - 1), current_request_packet, &current_master_session.config.qos);
+    ret = d7atp_send_request(current_master_session.token, current_request_id, (current_request_id == current_master_session.next_request_id - 1), current_request_packet, &current_master_session.config.qos);
+    if (ret == EPERM)
+    {
+        // this is probably because no further encryption is possible (frame counter reaches the maximum value)
+        // TODO return an error code to the application?
+        DPRINT("Request sending is not allowed likely because frame counter reaches its maximum value");
+    }
 }
 
 // TODO document state diagram
